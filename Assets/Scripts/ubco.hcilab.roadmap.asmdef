@@ -9,7 +9,10 @@
         "Google.XR.ARCoreExtensions",
         "Microsoft.MixedReality.Toolkit",
         "Microsoft.MixedReality.Toolkit.SDK",
-        "Microsoft.MixedReality.Toolkit.Providers.XRSDK.Oculus"
+        "Microsoft.MixedReality.Toolkit.Providers.XRSDK.Oculus",
+        "Microsoft.MixedReality.Toolkit.Services.InputSystem",
+        "Unity.InputSystem",
+        "Microsoft.MixedReality.Toolkit.Services.InputSystem.Editor"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
