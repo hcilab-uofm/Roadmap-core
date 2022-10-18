@@ -1,0 +1,25 @@
+{
+  "name": "ubc.ok.hcilab.roadmap-unity",
+  "version": "0.1.0",
+  "displayName": "roadmap-core",
+  "description": "The roadmap package to use in projects.",
+  "unity": "2021.3",
+  "dependencies": {
+    "com.google.ar.core.arfoundation.extensions": "https://github.com/google-ar/arcore-unity-extensions.git",
+    "com.microsoft.mixedreality.toolkit.extensions": "file:MixedReality/com.microsoft.mixedreality.toolkit.extensions-2.8.2.tgz",
+    "com.microsoft.mixedreality.toolkit.foundation": "file:MixedReality/com.microsoft.mixedreality.toolkit.foundation-2.8.2.tgz",
+    "com.microsoft.mixedreality.toolkit.standardassets": "file:MixedReality/com.microsoft.mixedreality.toolkit.standardassets-2.8.2.tgz",
+    "com.unity.render-pipelines.universal": "12.1.7",
+    "com.unity.textmeshpro": "3.0.6",
+    "com.unity.xr.arcore": "4.2.6",
+    "com.unity.xr.arfoundation": "4.2.6",
+    "com.unity.xr.arkit": "4.1.5",
+    "com.unity.xr.oculus": "3.0.2"
+  },
+  "author": {
+    "name": "hcilab-ubco",
+    "email": "amshamoh@mail.ubc.ca"
+  },
+  "scopedRegistries": [
+  ]
+}
