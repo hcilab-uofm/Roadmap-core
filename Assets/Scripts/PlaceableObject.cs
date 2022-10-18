@@ -363,8 +363,10 @@ namespace ubco.hcilab.roadmap
         /// <param name="material"></param>
         protected virtual void SetMaterials(Material material = null)
         {
-            for (int i = 0; i < _renderers.Length; i++)
-                _renderers[i].material = material == null ? _originalMaterials[i] : material;
+            /// This is meant as a way to notify whats happening
+            // TODO: Figure out a better way to do this?
+            // for (int i = 0; i < _renderers.Length; i++)
+            //     _renderers[i].material = material == null ? _originalMaterials[i] : material;
         }
 
         /// <summary>
