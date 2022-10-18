@@ -54,8 +54,8 @@ namespace ubco.hcilab.roadmap
         protected bool _isPlaceable = true,
                        _lockWorldPose;
 
-        protected TapToPlace tapToPlace;
-        protected BoundsControl boundsControl;
+        internal protected TapToPlace tapToPlace;
+        internal protected BoundsControl boundsControl;
 
         [Header("[ Snap To AR Planes ]")]
         [Tooltip("Continuously attempt to adjust position as ARPlanes are updated - during session this Placeable's Group was created only")]

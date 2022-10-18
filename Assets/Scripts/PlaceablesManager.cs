@@ -33,9 +33,6 @@ namespace ubco.hcilab.roadmap
         [Tooltip("Distance (m) at startup past which a new Group Anchor will be created")]
         [SerializeField] private float _maxGroupDistance = 10;
 
-        [Tooltip("Changing this key will wipe all saved data first time a new build is run")]
-        [SerializeField] private string _buildKey = "00001";
-
         /// <summary>
         /// Get all PlaceablesGroups that exist
         /// </summary>
@@ -97,6 +94,11 @@ namespace ubco.hcilab.roadmap
         [SerializeField] private Button InfoButton;
         [SerializeField] private GameObject DevPanel;
 
+        private string GetSaveFileLocation()
+        {
+            return System.IO.Path.Combine(Application.persistentDataPath, $"{applicationConfig.BuildKey}_{_storageKey}.json");
+        }
+
         private void Start()
         {
             OnInteractionStateChanged(InteractionManager.Instance.CurrentInteractionState);
@@ -105,7 +107,7 @@ namespace ubco.hcilab.roadmap
             /// Wipe local storage?
             bool wipePrefs = true;
 
-            if (PlayerPrefs.HasKey("BuildKey") && PlayerPrefs.GetString("BuildKey") == _buildKey)
+            if (PlayerPrefs.HasKey("BuildKey") && PlayerPrefs.GetString("BuildKey") == applicationConfig.BuildKey)
                 wipePrefs = false;
 
             if (wipePrefs)
@@ -427,7 +429,7 @@ namespace ubco.hcilab.roadmap
         {
             DestroyAll();
             PlayerPrefs.DeleteAll();
-            PlayerPrefs.SetString("BuildKey", _buildKey);
+            PlayerPrefs.SetString("BuildKey", applicationConfig.BuildKey);
             PlayerPrefs.Save();
             Debug.Log("Internal Storage Reset");
 
@@ -481,9 +483,11 @@ namespace ubco.hcilab.roadmap
                                              group.GroupData.Altitude.ToString("F2"));
             });
 
-            LocalStorageData storageData = new LocalStorageData(groupDataList);
-            PlayerPrefs.SetString(_storageKey, JsonUtility.ToJson(storageData));
+            LocalStorageData storageData = new LocalStorageData(groupDataList, PlatformManager.Instance.CurrentPlatform.ToString());
+            string jsonString = JsonUtility.ToJson(storageData);
+            PlayerPrefs.SetString(_storageKey, jsonString);
 
+            System.IO.File.WriteAllText(GetSaveFileLocation(), jsonString);
             PlayerPrefs.Save();
             _saveQueued = false;
         }
@@ -502,6 +506,7 @@ namespace ubco.hcilab.roadmap
                 return;
             }
 
+            // TODO: Use storageData.LastWrittenPlatform to tranlate between coordinate spaces;
             LocalStorageData storageData = JsonUtility.FromJson<LocalStorageData>(PlayerPrefs.GetString(_storageKey));
 
             storageData.Groups.ForEach(groupData =>

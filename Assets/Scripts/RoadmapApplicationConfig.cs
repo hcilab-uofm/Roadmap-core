@@ -13,11 +13,19 @@ namespace ubco.hcilab.roadmap
     {
         [SerializeField] public string identifier = "Data";
         [SerializeField] private BoxDisplayConfiguration boxDisplayConfiguration;
+        [SerializeField] private ScaleHandlesConfiguration scaleHandlesConfiguration;
+        [SerializeField] private RotationHandlesConfiguration rotationHandlesConfiguration;
+
+        [Tooltip("Changing this key will wipe all saved data first time a new build is run")]
+        [SerializeField] private string _buildKey = "00001";
+
         /// <summary>
         /// PlaceableObject prefabs available to be instantiated. At least 1 is required.
         /// Defaults to index 0. Custom UI needed to change during runtime.
         /// </summary>
         [SerializeField] private List<PlaceableContainer> placables;
+
+        public string BuildKey { get => identifier + _buildKey; private set => _buildKey = value; }
 
         public PlaceableObject GetPlacable(string identifier, Transform parent=null)
         {

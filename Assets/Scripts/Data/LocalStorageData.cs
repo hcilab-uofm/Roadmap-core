@@ -6,9 +6,11 @@ namespace ubco.hcilab
     public class LocalStorageData
     {
         public List<GroupData> Groups;
-        public LocalStorageData(List<GroupData> groups)
+        public string LastWrittenPlatform;
+        public LocalStorageData(List<GroupData> groups, string lastWrittenPlatform)
         {
             Groups = groups;
+            LastWrittenPlatform = lastWrittenPlatform;
         }
     }
 }

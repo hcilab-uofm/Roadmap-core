@@ -30,6 +30,23 @@ namespace ubco.hcilab.roadmap
                     PlaceableObject placableObject= PlaceablesManager.Instance.applicationConfig.GetPlacable(item);
                     placedObjects.Add(placableObject);
                     placableObject.Init(item.identifier);
+
+                    placableObject.tapToPlace.OnPlacingStarted.AddListener(() => InteractionManager.Instance.SetInteractionState(InteractionState.Placing));
+
+                    System.Action callable = () => {
+                        InteractionManager.Instance.SetInteractionState(InteractionState.None);
+                        placableObject.FinalizePlacement();
+                        PlaceablesManager.Instance.ObjectPlaced?.Invoke(placableObject.gameObject);
+
+                        PlaceablesManager.Instance.Save();
+                    };
+
+                    placableObject.tapToPlace.OnPlacingStopped.AddListener(() => callable());
+
+                    placableObject.boundsControl.RotateStopped.AddListener(() => callable());
+
+                    placableObject.boundsControl.ScaleStopped.AddListener(() => callable());
+
                     placableObject.StartPlacement();
                 });
             }
