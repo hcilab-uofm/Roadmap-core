@@ -1,0 +1,14 @@
+diff --git a/Assets/Oculus/VR/Editor/OVREngineConfigurationUpdater.cs b/Assets/Oculus/VR/Editor/OVREngineConfigurationUpdater.cs
+index 2db9d8b..1708176 100644
+--- a/Assets/Oculus/VR/Editor/OVREngineConfigurationUpdater.cs
++++ b/Assets/Oculus/VR/Editor/OVREngineConfigurationUpdater.cs
+@@ -106,7 +106,7 @@ class OVREngineConfigurationUpdater
+ 		{
+ 			Debug.Log("OVREngineConfigurationUpdater: Setting orientation to Landscape Left");
+-			// Default screen orientation must be set to landscape left.
+-			PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
++			// Default screen orientation must be set to landscape left. This is being handled by the roadmap application.
++			// PlayerSettings.defaultInterfaceOrientation = UIOrientation.LandscapeLeft;
+ 		}
+ 
+ #if !USING_XR_SDK && !REQUIRES_XR_SDK
