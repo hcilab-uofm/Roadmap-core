@@ -1,0 +1,77 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9ce2bcdbfcfae94a81a0edcd27ec1ef, type: 3}
+  m_Name: SampleApplicationConfig
+  m_EditorClassIdentifier: 
+  identifier: SampleData
+  boxDisplayConfiguration: {fileID: 11400000, guid: d35d83b00d0d3ed45ae40f0d4f92cba7,
+    type: 2}
+  placables:
+  - identifier: bear
+    prefab: {fileID: 7976716205616327022, guid: ea04c7561090c461ab22d6d1b0c4b307,
+      type: 3}
+  - identifier: brick bridge
+    prefab: {fileID: 7976716205616327022, guid: 0e1d5cd0188cc422d948b76f47403d97,
+      type: 3}
+  - identifier: brick house
+    prefab: {fileID: 7976716205616327022, guid: a84b174b45d1642b7813b2cf181704ff,
+      type: 3}
+  - identifier: buildings front
+    prefab: {fileID: 4073862824498060194, guid: 7e006cd0960a77d469b514e3a2acd1fe,
+      type: 3}
+  - identifier: school bus
+    prefab: {fileID: 7976716205616327022, guid: 1d627125c1f11490c924047b26b6fe51,
+      type: 3}
+  - identifier: cayote
+    prefab: {fileID: 7976716205616327022, guid: 6f63a01a4069b4394ae09e887a5898bf,
+      type: 3}
+  - identifier: grafiti wall
+    prefab: {fileID: 6557879472999804014, guid: 4527694b334f762449bafb4a1dd4c374,
+      type: 3}
+  - identifier: horse
+    prefab: {fileID: 7976716205616327022, guid: 69d268381fdf646df89eb3e12d954d8a,
+      type: 3}
+  - identifier: lamp
+    prefab: {fileID: 5846178580124233488, guid: 0f77af27ffc2a44ea9f49190eafaf220,
+      type: 3}
+  - identifier: old wood building
+    prefab: {fileID: 7976716205616327022, guid: f3847005c2d164124adea3d0ddab933a,
+      type: 3}
+  - identifier: old piano
+    prefab: {fileID: 7976716205616327022, guid: 7f2df1c92cbe54455bb21c85e0c06da0,
+      type: 3}
+  - identifier: park
+    prefab: {fileID: 9002464402794196502, guid: 61881c3b5920c4a1cbf230264d990512,
+      type: 3}
+  - identifier: platano tree
+    prefab: {fileID: 75680869086281657, guid: 4a1fdc84693390f41a01dd2a71ee1f9b, type: 3}
+  - identifier: pop dancer
+    prefab: {fileID: 9081975306632856850, guid: 36e8faceace6542f3a714295c8aac2a1,
+      type: 3}
+  - identifier: rock
+    prefab: {fileID: 7976716205616327022, guid: 613e109c0d2b24d3fa61204b63d8cc2b,
+      type: 3}
+  - identifier: rock
+    prefab: {fileID: 7976716205616327022, guid: 065d780aae643404fb800d781a685e4a,
+      type: 3}
+  - identifier: saloon piano
+    prefab: {fileID: 7976716205616327022, guid: 536f5ed92e37f48c98234d74c5ddfe7c,
+      type: 3}
+  - identifier: street lamp
+    prefab: {fileID: 6630965642052127174, guid: eb8ea8606876103429ccc82a680a2d0d,
+      type: 3}
+  - identifier: victorian street lamp
+    prefab: {fileID: 1561776013923871940, guid: b1275d1b9f27c6643a24775221d2a0cd,
+      type: 3}
+  - identifier: water
+    prefab: {fileID: 7976716205616327022, guid: 06175a8a1179646089a59b91a0096945,
+      type: 3}

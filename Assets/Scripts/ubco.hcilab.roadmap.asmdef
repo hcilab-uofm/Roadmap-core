@@ -1,0 +1,23 @@
+{
+    "name": "ubco.hcilab.roadmap",
+    "rootNamespace": "ubco.hcilab.roadmap",
+    "references": [
+        "Unity.XR.ARCore",
+        "Unity.TextMeshPro",
+        "Unity.XR.ARFoundation",
+        "Unity.XR.ARSubsystems",
+        "Google.XR.ARCoreExtensions",
+        "Microsoft.MixedReality.Toolkit",
+        "Microsoft.MixedReality.Toolkit.SDK",
+        "Microsoft.MixedReality.Toolkit.Providers.XRSDK.Oculus"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

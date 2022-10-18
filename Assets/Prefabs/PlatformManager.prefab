@@ -1,0 +1,132 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3712792764165016381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3712792764165016383}
+  - component: {fileID: 3712792764165016379}
+  - component: {fileID: 3712792764165016378}
+  - component: {fileID: 3712792764165016376}
+  m_Layer: 0
+  m_Name: PlatformManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3712792764165016383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3712792764165016381}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3712792764165016379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3712792764165016381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90f935c05e027254d91f49f8d9fdbc9c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CurrentPlatform: 1
+  OculusCamera: {fileID: 0}
+  ARCoreCamera: {fileID: 0}
+  OculusMenu: {fileID: 0}
+  ARCoreMenu: {fileID: 0}
+  OculusDetected:
+    m_PersistentCalls:
+      m_Calls: []
+  ARCoreDetected:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3712792764165016378
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3712792764165016381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f25e71cf6b6ff8143b50ccafd40f82dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 0}
+  preview: {fileID: 0}
+  InteractionStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  ObjectTapped:
+    m_PersistentCalls:
+      m_Calls: []
+  ObjectReleased:
+    m_PersistentCalls:
+      m_Calls: []
+  PlaceableHovered:
+    m_PersistentCalls:
+      m_Calls: []
+  VibratingOnce:
+    m_PersistentCalls:
+      m_Calls: []
+  interactionState: 0
+  touchedObject: {fileID: 0}
+  run: 0
+  StartButton: {fileID: 0}
+  StartButtonLabel: {fileID: 0}
+  PlanesLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
+  PlaceablesLayerMask:
+    serializedVersion: 2
+    m_Bits: 2
+  _maxRaycastDistance: 3
+--- !u!114 &3712792764165016376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3712792764165016381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4548813502247aa4ebb8734a8966baf0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  applicationConfig: {fileID: 11400000, guid: 20a53a87381e83c4bbb4d4e8a02658f5, type: 2}
+  _placeablesGroupPrefab: {fileID: 4959040518880998011, guid: fe8dd132b21b9104da50972b7f90b193,
+    type: 3}
+  _placingReticlePrefab: {fileID: 5016941685663849754, guid: 370fec86ea028bc4d800e46219cc8219,
+    type: 3}
+  _maxGroupDistance: 10
+  _buildKey: 00001
+  ObjectPlaced:
+    m_PersistentCalls:
+      m_Calls: []
+  GroupLoaded:
+    m_PersistentCalls:
+      m_Calls: []
+  AllGroupsLoaded:
+    m_PersistentCalls:
+      m_Calls: []
+  typeOptions: {fileID: 0}
+  DevButton: {fileID: 0}
+  InfoButton: {fileID: 0}
+  DevPanel: {fileID: 0}

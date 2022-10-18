@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &8640453180476452967
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8640453180476452962}
+  - component: {fileID: 8640453180476452961}
+  - component: {fileID: 8640453180476452960}
+  m_Layer: 0
+  m_Name: ARPlatformManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8640453180476452962
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8640453180476452967}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.7049607, y: 0.016197322, z: -0.18277666}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8640453180476452961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8640453180476452967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6025374ebe5875247acdf774a00296b5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SessionOrigin: {fileID: 0}
+  Session: {fileID: 0}
+  AnchorManager: {fileID: 0}
+  EarthManager: {fileID: 0}
+  ARCoreExtensions: {fileID: 0}
+  InitCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  AccuracyImproved:
+    m_PersistentCalls:
+      m_Calls: []
+  TargetAccuracyReached:
+    m_PersistentCalls:
+      m_Calls: []
+  ErrorStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  _minimumHorizontalAccuracy: 10
+  _minimumHeadingAccuracy: 50
+  _minimumVerticalAccuracy: 10.5
+  _targetHorizontalAccuracy: 1
+  _targetHeadingAccuracy: 2
+  _targetVerticalAccuracy: 0.5
+  _initTime: 3
+--- !u!114 &8640453180476452960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8640453180476452967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87c05f17057627744875152891a56d67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ARPlaneManager: {fileID: 0}
+  ARRaycastManager: {fileID: 0}
+  ARPlaneChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  ARHitPoseUpdated:
+    m_PersistentCalls:
+      m_Calls: []
+  TouchPositionChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  _planeTypes: 1
+  _maxRaycastDistance: 3
+  _fallbackPlacementPos: {x: 0, y: 0, z: 2}
+  _filterHitsBySize: 0
+  _cullBySizeOnHit: 0
+  _cullAllButLargestPlane: 0
+  _screenTapLowerCutoff: 0.15
