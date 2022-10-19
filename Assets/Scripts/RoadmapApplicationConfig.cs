@@ -139,6 +139,11 @@ namespace ubco.hcilab.roadmap
             //     newObject.AddComponent<RotationAxisConstraint>();
             // }
         }
+
+        public void AddPrefab(string identifier, GameObject prefab)
+        {
+            placables.Add(new PlaceableContainer(identifier, prefab));
+        }
     }
 
     [System.Serializable]
@@ -146,5 +151,11 @@ namespace ubco.hcilab.roadmap
     {
         public string identifier;
         public GameObject prefab;
+
+        public PlaceableContainer(string identifier, GameObject prefab)
+        {
+            this.identifier = identifier;
+            this.prefab = prefab;
+        }
     }
 }
