@@ -30,7 +30,6 @@ namespace ubco.hcilab.roadmap.editor
                 window.SetValues(path, files, () => {
                     foreach (string file in files)
                     {
-                        Debug.Log(Path.GetRelativePath(Path.GetDirectoryName(Application.dataPath), file));
                         config.AddPrefab(Path.GetFileNameWithoutExtension(file),
                                          AssetDatabase.LoadAssetAtPath<GameObject>(Path.GetRelativePath(Path.GetDirectoryName(Application.dataPath),
                                                                                                         file)));

@@ -2,7 +2,9 @@
     "name": "ubco.hcilab.roadmap.editor",
     "rootNamespace": "ubco.hcilab.roadmap.editor",
     "references": [
-        "GUID:ebfaddfcae17faa4c93df0b772da25a1"
+        "ubco.hcilab.roadmap",
+        "Unity.XR.Management",
+        "Unity.XR.Management.Editor"
     ],
     "includePlatforms": [
         "Editor"
