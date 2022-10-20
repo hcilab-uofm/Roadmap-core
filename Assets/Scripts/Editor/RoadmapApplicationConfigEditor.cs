@@ -16,6 +16,9 @@ namespace ubco.hcilab.roadmap.editor
         RoadmapApplicationConfig config;
         bool configChanged = false;
         (bool i, bool p) configState;
+        SerializedProperty boxDisplayConfigurationProp,
+            scaleHandlesConfigurationProp,
+            rotationHandlesConfigurationProp;
 
         private void OnEnable()
         {
@@ -23,6 +26,10 @@ namespace ubco.hcilab.roadmap.editor
             config.onChanged += () => {
                 configChanged = true;
             };
+
+            boxDisplayConfigurationProp = serializedObject.FindProperty("boxDisplayConfiguration");
+            scaleHandlesConfigurationProp = serializedObject.FindProperty("scaleHandlesConfiguration");
+            rotationHandlesConfigurationProp = serializedObject.FindProperty("rotationHandlesConfiguration");
         }
 
         public override void OnInspectorGUI()
@@ -79,6 +86,35 @@ namespace ubco.hcilab.roadmap.editor
                 });
                 window.ShowPopup();
             }
+
+            if (boxDisplayConfigurationProp.objectReferenceValue == null ||
+                scaleHandlesConfigurationProp.objectReferenceValue == null ||
+                rotationHandlesConfigurationProp.objectReferenceValue == null)
+            {
+                if (GUILayout.Button(new GUIContent("Add default values for empty configs",
+                                                    "Add default values for the configs.")))
+                {
+                    if (boxDisplayConfigurationProp.objectReferenceValue == null)
+                    {
+                        boxDisplayConfigurationProp.objectReferenceValue = (Object)AssetDatabase
+                            .LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/BoxDisplayConfiguration.asset",
+                                                                                                                  typeof(Object));
+                    }
+                    if (scaleHandlesConfigurationProp.objectReferenceValue == null)
+                    {
+                        scaleHandlesConfigurationProp.objectReferenceValue = (Object)AssetDatabase
+                            .LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/ScaleHandlesConfiguration.asset",
+                                             typeof(Object));
+                    }
+                    if (rotationHandlesConfigurationProp.objectReferenceValue == null)
+                    {
+                        rotationHandlesConfigurationProp.objectReferenceValue = (Object)AssetDatabase.
+                            LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/RotationHandlesConfiguration.asset",
+                                            typeof(Object));
+                    }
+                }
+            }
+
             serializedObject.ApplyModifiedProperties();
         }
     }
