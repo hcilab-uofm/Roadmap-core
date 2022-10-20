@@ -140,6 +140,11 @@ namespace ubco.hcilab.roadmap.editor
 
         private void ActivateScene(SceneAsset sceneAsset)
         {
+            if (sceneAsset == null)
+            {
+                throw new Exception("Respective scene is empty.");
+            }
+
             string scenepath = AssetDatabase.GetAssetPath(sceneAsset);
             bool found = false;
 
