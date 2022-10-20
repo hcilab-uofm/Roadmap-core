@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -49,6 +50,7 @@ namespace ubco.hcilab.roadmap.editor
         private string path;
         private string[] files;
         private System.Action okCallback;
+        private Vector2 scrollPos;
 
         public void SetValues(string path, string[] files, System.Action okCallback)
         {
@@ -61,7 +63,12 @@ namespace ubco.hcilab.roadmap.editor
         {
             GUILayout.Label("Add all prefabs in directory:", EditorStyles.boldLabel);
             EditorGUILayout.LabelField($"From location: {path}         Count: " + files.Length);
-            EditorGUILayout.HelpBox(string.Join("\n", files), MessageType.None);
+            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+            EditorGUILayout.BeginVertical();
+            EditorGUILayout.HelpBox(string.Join("\n", files.Select(x => "- " + x)), MessageType.None);
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.EndScrollView();
+
             if(GUILayout.Button("OK"))
             {
                 this.okCallback?.Invoke();
