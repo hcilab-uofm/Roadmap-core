@@ -23,7 +23,7 @@ namespace ubco.hcilab.roadmap
         /// PlaceableObject prefabs available to be instantiated. At least 1 is required.
         /// Defaults to index 0. Custom UI needed to change during runtime.
         /// </summary>
-        [SerializeField] private List<PlaceableContainer> placables;
+        [SerializeField] private List<PlaceableContainer> placables = new List<PlaceableContainer>();
 
         public string BuildKey { get => identifier + _buildKey; private set => _buildKey = value; }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ubco.hcilab.roadmap.editor
 {
@@ -24,16 +25,13 @@ namespace ubco.hcilab.roadmap.editor
             if(GUILayout.Button(new GUIContent("Add prefabs from a folder",
                                                "Automatically add files with extension `.prefab` to the `Placables` list.")))
             {
-                string path = EditorUtility.OpenFolderPanel("Load prefabs from direcotry", "", "");
-                string[] files = Directory.GetFiles(path, "*.prefab", SearchOption.AllDirectories);
-
                 FileSelectionPopup window = (FileSelectionPopup)EditorWindow.GetWindow(typeof(FileSelectionPopup));
-                window.SetValues(path, files, () => {
+
+                window.SetValues((files) => {
                     foreach (string file in files)
                     {
                         config.AddPrefab(Path.GetFileNameWithoutExtension(file),
-                                         AssetDatabase.LoadAssetAtPath<GameObject>(Path.GetRelativePath(Path.GetDirectoryName(Application.dataPath),
-                                                                                                        file)));
+                                         AssetDatabase.LoadAssetAtPath<GameObject>(file));
                     }
                     EditorUtility.SetDirty(config);
                     AssetDatabase.SaveAssets();
@@ -49,35 +47,79 @@ namespace ubco.hcilab.roadmap.editor
     {
         private string path;
         private string[] files;
-        private System.Action okCallback;
+        private System.Action<string[]> okCallback;
         private Vector2 scrollPos;
+        private Object folder;
+        private Object prevFolder;
+        private bool checkPath = false;
 
-        public void SetValues(string path, string[] files, System.Action okCallback)
+        public void SetValues(System.Action<string[]> okCallback)
         {
-            this.path = path;
-            this.files = files;
             this.okCallback = okCallback;
+        }
+
+        bool CheckFolder()
+        {
+            return folder != null && AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(folder));
         }
 
         void OnGUI()
         {
-            GUILayout.Label("Add all prefabs in directory:", EditorStyles.boldLabel);
-            EditorGUILayout.LabelField($"From location: {path}         Count: " + files.Length);
-            scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-            EditorGUILayout.BeginVertical();
-            EditorGUILayout.HelpBox(string.Join("\n", files.Select(x => "- " + x)), MessageType.None);
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndScrollView();
-
-            if(GUILayout.Button("OK"))
+            EditorGUILayout.BeginHorizontal();
+            folder = EditorGUILayout.ObjectField("Location: ", folder, typeof(DefaultAsset), false);
+            if (GUILayout.Button("Select folder", GUILayout.Width(100)))
             {
-                this.okCallback?.Invoke();
-                this.Close();
+                path = EditorUtility.OpenFolderPanel("Load prefabs from direcotry", "", "");
+                path = Path.GetRelativePath(Path.GetDirectoryName(Application.dataPath), path);
+                checkPath = true;
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (checkPath && !string.IsNullOrEmpty(path))
+            {
+                folder = AssetDatabase.LoadAssetAtPath(path, typeof(Object));
+                if (!CheckFolder())
+                {
+                    EditorGUILayout.HelpBox("Folder invalid. Consider drag and drop.", MessageType.Error);
+                }
             }
 
-            if(GUILayout.Button("Cancel"))
+            if (CheckFolder())
             {
-                this.Close();
+                checkPath = false;
+                path = null;
+
+                if (folder != prevFolder)
+                {
+                    files = AssetDatabase.FindAssets("t:prefab", new string[] { AssetDatabase.GetAssetPath(folder) })
+                        .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                        .ToArray();
+                    prevFolder = folder;
+                }
+
+                GUILayout.Label("Add all prefabs in directory:", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("From location: " + AssetDatabase.GetAssetPath(folder));
+                EditorGUILayout.LabelField("Count: " + files.Length);
+                scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                EditorGUILayout.BeginVertical();
+                EditorGUILayout.HelpBox(string.Join("\n", files.Select(x => "- " + x)), MessageType.None);
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndScrollView();
+
+                if(GUILayout.Button("OK"))
+                {
+                    this.okCallback?.Invoke(files);
+                    this.Close();
+                }
+
+                if(GUILayout.Button("Cancel"))
+                {
+                    this.Close();
+                }
+            }
+            else
+            {
+                EditorGUILayout.LabelField("Drag and drop a directory from the Project window or use 'Select folder'.");
             }
         }
     }
