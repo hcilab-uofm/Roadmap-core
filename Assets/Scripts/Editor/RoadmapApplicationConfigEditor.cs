@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -13,15 +14,54 @@ namespace ubco.hcilab.roadmap.editor
     public class RoadmapApplicationConfigEditor : Editor
     {
         RoadmapApplicationConfig config;
+        bool configChanged = false;
+        (bool i, bool p) configState;
+
         private void OnEnable()
         {
             config = target as RoadmapApplicationConfig;
+            config.onChanged += () => {
+                configChanged = true;
+            };
         }
 
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             serializedObject.Update();
+
+            if (configChanged)
+            {
+                configState = config.VerifyDuplicates();
+                configChanged = false;
+            }
+
+            if (configState.i || configState.p)
+            {
+                EditorGUILayout.HelpBox($"There are duplicate entries - in identifiers: {configState.i}, in prefabs: {configState.p}", MessageType.Warning);
+            }
+
+            EditorGUILayout.BeginHorizontal();
+
+            if (configState.i)
+            {
+                if (GUILayout.Button(new GUIContent("Remove duplicate identifiers",
+                                                    "Keeps only one of the entries with the same name")))
+                {
+                    config.RemoveDuplicateNames();
+                }
+            }
+
+            if (configState.p)
+            {
+                if (GUILayout.Button(new GUIContent("Remove duplicate prefabs",
+                                                    "Keeps only one of the entries with the same prefab")))
+                {
+                    config.RemoveDuplicatePrefabs();
+                }
+            }
+            EditorGUILayout.EndHorizontal();
+
             if(GUILayout.Button(new GUIContent("Add prefabs from a folder",
                                                "Automatically add files with extension `.prefab` to the `Placables` list.")))
             {

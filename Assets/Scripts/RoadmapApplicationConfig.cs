@@ -25,6 +25,8 @@ namespace ubco.hcilab.roadmap
         /// </summary>
         [SerializeField] private List<PlaceableContainer> placables = new List<PlaceableContainer>();
 
+        public System.Action onChanged;
+
         public string BuildKey { get => identifier + _buildKey; private set => _buildKey = value; }
 
         public PlaceableObject GetPlacable(string identifier, Transform parent=null)
@@ -140,9 +142,33 @@ namespace ubco.hcilab.roadmap
             // }
         }
 
+        private void OnValidate()
+        {
+            onChanged?.Invoke();
+        }
+
         public void AddPrefab(string identifier, GameObject prefab)
         {
             placables.Add(new PlaceableContainer(identifier, prefab));
+        }
+
+        public (bool, bool) VerifyDuplicates()
+        {
+            bool identifier = placables.GroupBy(x => x.identifier).Any(g => g.Count() > 1);
+            bool prefabs = placables.GroupBy(x => x.prefab).Any(g => g.Count() > 1);
+            return (identifier, prefabs);
+        }
+
+        public void RemoveDuplicateNames()
+        {
+            placables = placables.GroupBy(x => x.identifier).Select(g => g.First()).ToList();
+            OnValidate();
+        }
+
+        public void RemoveDuplicatePrefabs()
+        {
+            placables = placables.GroupBy(x => x.prefab).Select(g => g.First()).ToList();
+            OnValidate();
         }
     }
 
