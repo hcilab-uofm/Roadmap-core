@@ -9,6 +9,8 @@ using System.IO;
 using System.Diagnostics;
 using System.Text;
 using System.Linq;
+using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace ubco.hcilab.roadmap.editor
 {
@@ -31,10 +33,21 @@ namespace ubco.hcilab.roadmap.editor
             EditorPrefs.SetString("OVRBuild_BuiltAPKPath", buildPath);
         }
 
-        [MenuItem("Roadmap/BuildAndRunSetup", false, 100)]
+        [MenuItem("Roadmap/Build and run", false, 100)]
         static void Init()
         {
             EditorWindow.GetWindow<RoadmapBuildSetupEditor>(false, "Roadmap Build Setup", true);
+        }
+
+        [MenuItem("Roadmap/Setup URP default assets", false, 100)]
+        static void test()
+        {
+            UniversalRenderPipelineAsset sqAsset = (UniversalRenderPipelineAsset) AssetDatabase.LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Essentials/Settings/UniversalRenderPipelineAsset_StandardQuality.asset", typeof(UniversalRenderPipelineAsset));
+            QualitySettings.renderPipeline = sqAsset;
+            GraphicsSettings.defaultRenderPipeline = sqAsset;
+
+            // FIXME: This forces the creation of the UniversalRenderPipelineGlobalSettings? Couldn't figure out anoahter way to to this.
+            new UniversalRenderPipeline(sqAsset);
         }
 
         private void OnGUI()
