@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace ubco.hcilab.roadmap
 {
-    public enum Platform { Oculs, ARCore }
+    public enum Platform { Oculus, ARCore }
 
     /// <summary>
     /// Singleton Class
@@ -41,7 +41,7 @@ namespace ubco.hcilab.roadmap
                     // Call events attached through the UI
                     ARCoreDetected?.Invoke();
                     break;
-                case Platform.Oculs:
+                case Platform.Oculus:
                     SetupOculus();
                     // Do any setup to deactivate other platforms
                     SetupARCore(isActive: false);

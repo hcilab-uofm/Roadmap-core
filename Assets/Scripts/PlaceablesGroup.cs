@@ -54,7 +54,7 @@ namespace ubco.hcilab.roadmap
                 case Platform.ARCore:
                     AttachToNewGeoAnchor(GeospatialManager.Instance.RequestGeospatialAnchor());
                     break;
-                case Platform.Oculs:
+                case Platform.Oculus:
                     break;
                 default:
                     throw new NotImplementedException();
@@ -69,7 +69,7 @@ namespace ubco.hcilab.roadmap
                         GeospatialManager.Instance.AccuracyImproved.AddListener(OnAccuracyImproved);
                     }
                     break;
-                case Platform.Oculs:
+                case Platform.Oculus:
                     break;
                 default:
                     throw new NotImplementedException();
@@ -102,7 +102,7 @@ namespace ubco.hcilab.roadmap
                     else
                         GeospatialManager.Instance.TargetAccuracyReached.AddListener(DetachFromGeoAnchor);
                     break;
-                case Platform.Oculs:
+                case Platform.Oculus:
                     // TODO: add the resotre values?
                     break;
                 default:
@@ -183,7 +183,7 @@ namespace ubco.hcilab.roadmap
                                                GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Heading,
                                                new List<PlaceableObjectData>());
                     break;
-                case Platform.Oculs:
+                case Platform.Oculus:
                     _groupData = new GroupData(Camera.main.transform.position.x,
                                                Camera.main.transform.position.z,
                                                Camera.main.transform.position.y,

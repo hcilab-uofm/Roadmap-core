@@ -135,7 +135,7 @@ namespace ubco.hcilab.roadmap
                 case Platform.ARCore:
                     GeospatialManager.Instance.InitCompleted.AddListener(OnGeoInitCompleted);
                     break;
-                case Platform.Oculs:
+                case Platform.Oculus:
                     RestoreSavedPlaceablesGroups();
                     break;
             }
@@ -219,7 +219,7 @@ namespace ubco.hcilab.roadmap
                     ARInteractionManager.Instance.ARHitPoseUpdated.RemoveListener(SetCurrentPlaceable);
                     ARInteractionManager.Instance.ARPlaneChanged.RemoveListener(OnARPlaneChanged);
                     break;
-                case Platform.Oculs:
+                case Platform.Oculus:
                     break;
                 default:
                     throw new NotImplementedException();
@@ -234,7 +234,7 @@ namespace ubco.hcilab.roadmap
                         ARInteractionManager.Instance.ARHitPoseUpdated.AddListener(SetCurrentPlaceable);
                         ARInteractionManager.Instance.ARPlaneChanged.AddListener(OnARPlaneChanged);
                         break;
-                    case Platform.Oculs:
+                    case Platform.Oculus:
                         break;
                     default:
                         throw new NotImplementedException();
