@@ -4,7 +4,9 @@ using System.Linq;
 using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
+using UnityEditor;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace ubco.hcilab.roadmap
 {
@@ -12,9 +14,6 @@ namespace ubco.hcilab.roadmap
     public class RoadmapApplicationConfig : ScriptableObject
     {
         [SerializeField] public string identifier = "Data";
-        [SerializeField] private BoxDisplayConfiguration boxDisplayConfiguration;
-        [SerializeField] private ScaleHandlesConfiguration scaleHandlesConfiguration;
-        [SerializeField] private RotationHandlesConfiguration rotationHandlesConfiguration;
 
         [Tooltip("Changing this key will wipe all saved data first time a new build is run")]
         [SerializeField] private string _buildKey = "00001";
@@ -26,6 +25,9 @@ namespace ubco.hcilab.roadmap
         [SerializeField] private List<PlaceableContainer> placables = new List<PlaceableContainer>();
 
         public System.Action onChanged;
+        private BoxDisplayConfiguration boxDisplayConfiguration;
+        private ScaleHandlesConfiguration scaleHandlesConfiguration;
+        private RotationHandlesConfiguration rotationHandlesConfiguration;
 
         public string BuildKey { get => identifier + _buildKey; private set => _buildKey = value; }
 
@@ -142,9 +144,33 @@ namespace ubco.hcilab.roadmap
             // }
         }
 
+#if UNITY_EDITOR
         private void OnValidate()
         {
             onChanged?.Invoke();
+            ConfigureMRTKAssets();
+        }
+
+        private void ConfigureMRTKAssets()
+        {
+            if (boxDisplayConfiguration == null)
+            {
+                boxDisplayConfiguration = (BoxDisplayConfiguration)AssetDatabase
+                    .LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/BoxDisplayConfiguration.asset",
+                                     typeof(BoxDisplayConfiguration));
+            }
+            if (scaleHandlesConfiguration == null)
+            {
+                scaleHandlesConfiguration = (ScaleHandlesConfiguration)AssetDatabase
+                    .LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/ScaleHandlesConfiguration.asset",
+                                     typeof(ScaleHandlesConfiguration));
+            }
+            if (rotationHandlesConfiguration == null)
+            {
+                rotationHandlesConfiguration = (RotationHandlesConfiguration)AssetDatabase.
+                    LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/RotationHandlesConfiguration.asset",
+                                    typeof(RotationHandlesConfiguration));
+            }
         }
 
         public void AddPrefab(string identifier, GameObject prefab)
@@ -170,6 +196,7 @@ namespace ubco.hcilab.roadmap
             placables = placables.GroupBy(x => x.prefab).Select(g => g.First()).ToList();
             OnValidate();
         }
+#endif
     }
 
     [System.Serializable]
