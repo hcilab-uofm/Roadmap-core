@@ -131,11 +131,14 @@ namespace ubco.hcilab.roadmap
                BoundsControl boundsControl = newObject.AddComponent<BoundsControl>();
                boundsControl.BoundsControlActivation = Microsoft.MixedReality.Toolkit.UI.BoundsControlTypes.BoundsControlActivationType.ActivateByPointer;
                boundsControl.BoxDisplayConfig = boxDisplayConfiguration;
+               boundsControl.RotationHandlesConfig = rotationHandlesConfiguration;
+               boundsControl.ScaleHandlesConfig = scaleHandlesConfiguration;
             }
 
             // if (newObject.GetComponent<MinMaxScaleConstraint>() == null)
             // {
-            //     newObject.AddComponent<MinMaxScaleConstraint>();
+            //     MinMaxScaleConstraint scaleConstraint = newObject.AddComponent<MinMaxScaleConstraint>();
+            //     scaleConstraint.ScaleMaximum = 1;
             // }
 
             // if (newObject.GetComponent<RotationAxisConstraint>() == null)
