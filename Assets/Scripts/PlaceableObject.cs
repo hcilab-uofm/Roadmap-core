@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.MixedReality.Toolkit.UI;
 using Microsoft.MixedReality.Toolkit.UI.BoundsControl;
 using Microsoft.MixedReality.Toolkit.Utilities.Solvers;
 using UnityEngine;
@@ -56,6 +57,7 @@ namespace ubco.hcilab.roadmap
 
         internal protected DoubleTapToPalce tapToPlace;
         internal protected BoundsControl boundsControl;
+        internal protected Interactable interactable;
 
         [Header("[ Snap To AR Planes ]")]
         [Tooltip("Continuously attempt to adjust position as ARPlanes are updated - during session this Placeable's Group was created only")]
@@ -93,6 +95,9 @@ namespace ubco.hcilab.roadmap
         {
             tapToPlace = GetComponent<DoubleTapToPalce>();
             boundsControl = GetComponent<BoundsControl>();
+            interactable = GetComponent<Interactable>();
+
+            interactable.OnClick.AddListener(() => InteractionManager.Instance.TouchedObject = this.gameObject );
 
             tapToPlace.OnPlacingStarted.AddListener(() => OnObjectTapped(gameObject));
             tapToPlace.OnPlacingStopped.AddListener(FinalizePlacement);

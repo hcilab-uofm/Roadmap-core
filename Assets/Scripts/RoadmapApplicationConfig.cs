@@ -148,6 +148,32 @@ namespace ubco.hcilab.roadmap
             // {
             //     newObject.AddComponent<RotationAxisConstraint>();
             // }
+
+            Interactable interactable = newObject.AddComponent<Interactable>();
+
+            // Get the default configuration for the Theme engine InteractableColorTheme
+            var newThemeType = ThemeDefinition.GetDefaultThemeDefinition<InteractableColorTheme>().Value;
+
+            // Define a color for every state in our Default Interactable States
+            newThemeType.StateProperties[0].Values = new List<ThemePropertyValue>()
+            {
+                new ThemePropertyValue() { Color = Color.white},  // Default
+                new ThemePropertyValue() { Color = Color.white},  // Focus
+                new ThemePropertyValue() { Color = Color.white},  // Pressed
+                new ThemePropertyValue() { Color = Color.white},  // Disabled
+            };
+
+            interactable.Profiles = new List<InteractableProfileItem>()
+            {
+                new InteractableProfileItem()
+                {
+                    Themes = new List<Theme>()
+                    {
+                        Interactable.GetDefaultThemeAsset(new List<ThemeDefinition>() { newThemeType })
+                    },
+                    Target = newObject,
+                },
+            };
         }
 
 #if UNITY_EDITOR
