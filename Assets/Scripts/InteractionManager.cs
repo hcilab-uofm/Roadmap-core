@@ -55,7 +55,12 @@ namespace ubco.hcilab.roadmap
         [HideInInspector] public UnityEvent VibratingOnce;
 
         [HideInInspector] public InteractionState interactionState = InteractionState.None;
-        [HideInInspector] public GameObject touchedObject;
+        [HideInInspector] public GameObject TouchedObject { get => touchedObject; set
+            {
+                touchedObject = value;
+                OnTouchObjectChanged?.Invoke(touchedObject);
+            }
+        }
         [HideInInspector] public bool run;
         private RaycastHit _raycastHit;
         private Ray _ray;
@@ -70,6 +75,14 @@ namespace ubco.hcilab.roadmap
         
         [Tooltip("Raycast hits beyond this distace are discarded")]
         [SerializeField] private float _maxRaycastDistance = 3;
+
+        private bool modifying = true;
+        private bool removing = false;
+        private GameObject touchedObject;
+
+        public System.Action<bool> OnModificationChanged;
+        public System.Action<GameObject> OnTouchObjectChanged;
+        public System.Action<GameObject> OnRemoveRequested;
 
         private void Start()
         {
@@ -143,6 +156,51 @@ namespace ubco.hcilab.roadmap
         public void VibrateOnce()
         {
             VibratingOnce?.Invoke();
+        }
+
+        /// <summary>
+        /// Callback for buttons to toggle the modifications state of Placeables
+        /// </summary>
+        public void ModifyModeToggle()
+        {
+            SetRemoving(false);
+            modifying = !modifying;
+            foreach (PlaceablesGroup _group in PlaceablesManager.Instance.PlaceablesGroups)
+            {
+                foreach (PlaceableObject item in _group.Placeables)
+                {
+                    item.ModifcationActive(modifying);
+                }
+            }
+            OnModificationChanged?.Invoke(modifying);
+        }
+
+        /// <summary>
+        /// Callback for buttons to toggle the remove on interaction.
+        /// </summary>
+        public void ToggleRemove()
+        {
+            SetRemoving(!removing);
+        }
+
+        public void SetRemoving(bool removing)
+        {
+            this.removing = removing;
+            if (this.removing)
+            {
+                TouchedObject = null;
+                OnTouchObjectChanged += RemoveOnTouch;
+            }
+            else
+            {
+                OnTouchObjectChanged -= RemoveOnTouch;
+            }
+        }
+
+        /// Wrapper for the callback used in ToggleRemove
+        private void RemoveOnTouch(GameObject obj)
+        {
+            OnRemoveRequested?.Invoke(obj);
         }
     }
 }

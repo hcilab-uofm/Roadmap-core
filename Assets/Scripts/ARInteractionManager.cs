@@ -124,6 +124,7 @@ namespace ubco.hcilab.roadmap
         {
             if (!_interactionManager.run) return;
 
+            // FIXME: This is handled by MRTK
             HandleScreenTap();
             HandleTapRelease();
             HandleSwipe();
@@ -173,8 +174,8 @@ namespace ubco.hcilab.roadmap
 
             if (Physics.Raycast(ray, out hit))
             {
-                _interactionManager.touchedObject = hit.collider.gameObject;
-                _interactionManager.ObjectTapped?.Invoke(_interactionManager.touchedObject);
+                _interactionManager.TouchedObject = hit.collider.gameObject;
+                _interactionManager.ObjectTapped?.Invoke(_interactionManager.TouchedObject);
             }
 
         }
@@ -187,10 +188,10 @@ namespace ubco.hcilab.roadmap
             if (Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Ended)
             {
 
-                if (_interactionManager.touchedObject != null)
+                if (_interactionManager.TouchedObject != null)
                 {
-                    _interactionManager.ObjectReleased?.Invoke(_interactionManager.touchedObject);
-                    _interactionManager.touchedObject = null;
+                    _interactionManager.ObjectReleased?.Invoke(_interactionManager.TouchedObject);
+                    _interactionManager.TouchedObject = null;
                 }
             }
         }
@@ -203,7 +204,7 @@ namespace ubco.hcilab.roadmap
         {
             if (Input.touchCount > 0 && Input.touches[0].phase == TouchPhase.Moved)
             {
-                if (_interactionManager.touchedObject != null)
+                if (_interactionManager.TouchedObject != null)
                 {
                     Vector2 pos = new Vector2(Input.touches[0].position.x, Input.touches[0].position.y);
                     Vector2 normalizedPos = NormalizedScreenPosition(pos);

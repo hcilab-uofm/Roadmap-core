@@ -53,23 +53,5 @@ namespace ubco.hcilab.roadmap
             gridObjectCollection.UpdateCollection();
             // scrollMenu.gameObject.SetActive(true);
         }
-
-        public void ModifyModeToggle()
-        {
-            modifying = !modifying;
-            foreach (PlaceableObject item in placedObjects)
-            {
-                item.ModifcationActive(modifying);
-            }
-
-            if (modifying)
-            {
-                modifyButton.MainLabelText = "Modify Toggle Off";
-            }
-            else
-            {
-                modifyButton.MainLabelText = "Modify Toggle On";
-            }
-        }
     }
 }
