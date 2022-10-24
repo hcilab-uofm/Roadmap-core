@@ -215,18 +215,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &379799221 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 8549471361465804149, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
-    type: 3}
-  m_PrefabInstance: {fileID: 8549471361157309376}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4068290afd756344cba538c1fab48c34, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &457292403
 GameObject:
   m_ObjectHideFlags: 0
@@ -641,12 +629,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1829098948}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1896185969 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 7265346250478952288, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
-    type: 3}
-  m_PrefabInstance: {fileID: 8549471361157309376}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2091362212
 GameObject:
   m_ObjectHideFlags: 0
@@ -700,31 +682,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 4729591323536350734, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
-        type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 1896185969}
-    - target: {fileID: 4729591323536350734, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
-        type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: SetActive
-      objectReference: {fileID: 0}
-    - target: {fileID: 4729591325176984820, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
-        type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 379799221}
-    - target: {fileID: 4729591325176984820, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
-        type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: ModifyModeToggle
-      objectReference: {fileID: 0}
-    - target: {fileID: 4729591325176984820, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
-        type: 3}
-      propertyPath: OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: ubco.hcilab.roadmap.VRInteractionManager, Assembly-CSharp
       objectReference: {fileID: 0}
     - target: {fileID: 8549471361465804148, guid: 65397e0a912c9ec4eb8e0e7b9f6a24ba,
         type: 3}
