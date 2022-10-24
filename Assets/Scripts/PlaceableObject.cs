@@ -54,7 +54,7 @@ namespace ubco.hcilab.roadmap
         protected bool _isPlaceable = true,
                        _lockWorldPose;
 
-        internal protected TapToPlace tapToPlace;
+        internal protected DoubleTapToPalce tapToPlace;
         internal protected BoundsControl boundsControl;
 
         [Header("[ Snap To AR Planes ]")]
@@ -91,7 +91,7 @@ namespace ubco.hcilab.roadmap
 
         protected virtual void Setup()
         {
-            tapToPlace = GetComponent<TapToPlace>();
+            tapToPlace = GetComponent<DoubleTapToPalce>();
             boundsControl = GetComponent<BoundsControl>();
 
             tapToPlace.OnPlacingStarted.AddListener(() => OnObjectTapped(gameObject));

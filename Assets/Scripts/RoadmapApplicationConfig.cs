@@ -28,6 +28,7 @@ namespace ubco.hcilab.roadmap
         private BoxDisplayConfiguration boxDisplayConfiguration;
         private ScaleHandlesConfiguration scaleHandlesConfiguration;
         private RotationHandlesConfiguration rotationHandlesConfiguration;
+        private TranslationHandlesConfiguration translationHandlesConfig;
 
         public string BuildKey { get => identifier + _buildKey; private set => _buildKey = value; }
 
@@ -115,15 +116,16 @@ namespace ubco.hcilab.roadmap
 
         private void SetupMRTKControls(GameObject newObject)
         {
-            if (newObject.GetComponent<TapToPlace>() == null)
+            if (newObject.GetComponent<DoubleTapToPalce>() == null)
             {
-                TapToPlace tapToPlace = newObject.AddComponent<TapToPlace>();
+                DoubleTapToPalce tapToPlace = newObject.AddComponent<DoubleTapToPalce>();
                 tapToPlace.DefaultPlacementDistance = 10;
                 tapToPlace.MaxRaycastDistance = 50;
                 tapToPlace.UseDefaultSurfaceNormalOffset = false;
 
                 SolverHandler solverHandler = newObject.GetComponent<SolverHandler>();
                 solverHandler.TrackedTargetType = Microsoft.MixedReality.Toolkit.Utilities.TrackedObjectType.Head;
+
             }
 
             if (newObject.GetComponent<BoundsControl>() == null)
@@ -133,6 +135,7 @@ namespace ubco.hcilab.roadmap
                boundsControl.BoxDisplayConfig = boxDisplayConfiguration;
                boundsControl.RotationHandlesConfig = rotationHandlesConfiguration;
                boundsControl.ScaleHandlesConfig = scaleHandlesConfiguration;
+               boundsControl.TranslationHandlesConfig = translationHandlesConfig;
             }
 
             // if (newObject.GetComponent<MinMaxScaleConstraint>() == null)
@@ -173,6 +176,12 @@ namespace ubco.hcilab.roadmap
                 rotationHandlesConfiguration = (RotationHandlesConfiguration)AssetDatabase.
                     LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/RotationHandlesConfiguration.asset",
                                     typeof(RotationHandlesConfiguration));
+            }
+            if (translationHandlesConfig == null)
+            {
+                translationHandlesConfig = (TranslationHandlesConfiguration)AssetDatabase.
+                    LoadAssetAtPath("Packages/ubc.ok.hcilab.roadmap-unity/Assets/Settings/TranslationHandlesConfiguration.asset",
+                                    typeof(TranslationHandlesConfiguration));
             }
         }
 
