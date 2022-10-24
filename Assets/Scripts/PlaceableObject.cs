@@ -99,9 +99,24 @@ namespace ubco.hcilab.roadmap
 
             interactable.OnClick.AddListener(() => InteractionManager.Instance.TouchedObject = this.gameObject );
 
-            tapToPlace.OnPlacingStarted.AddListener(() => OnObjectTapped(gameObject));
-            tapToPlace.OnPlacingStopped.AddListener(FinalizePlacement);
-            // FIXME: This also has to hook into the boundsControl?
+            System.Action callable = () => {
+                InteractionManager.Instance.SetInteractionState(InteractionState.None);
+                FinalizePlacement();
+                PlaceablesManager.Instance.ObjectPlaced?.Invoke(gameObject);
+
+                PlaceablesManager.Instance.Save();
+            };
+
+            tapToPlace.OnPlacingStarted.AddListener(() =>
+            {
+                OnObjectTapped(gameObject);
+                InteractionManager.Instance.SetInteractionState(InteractionState.Placing);
+            });
+            tapToPlace.OnPlacingStopped.AddListener(() => callable());
+
+            boundsControl.RotateStopped.AddListener(() => callable());
+            boundsControl.ScaleStopped.AddListener(() => callable());
+            boundsControl.TranslateStopped.AddListener(() => callable());
 
             SetupRenderers();
         }
@@ -118,6 +133,7 @@ namespace ubco.hcilab.roadmap
         {
             boundsControl.enabled = active;
             tapToPlace.enabled = active;
+            interactable.IsEnabled = active;
         }
 
         /// <summary>
