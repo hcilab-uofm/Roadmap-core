@@ -10,7 +10,10 @@ namespace ubco.hcilab.roadmap
     {
         [SerializeField] private GameObject scrollMenu;
         [SerializeField] private GameObject menuItemPrefab;
+        [SerializeField] private ButtonConfigHelper menuButton;
+        [SerializeField] private ButtonConfigHelper removeButton;
         [SerializeField] private ButtonConfigHelper modifyButton;
+        [SerializeField] private GameObject dialogPrefab;
 
         private List<PlaceableObject> placedObjects = new List<PlaceableObject>();
         // Start is called before the first frame update
@@ -34,7 +37,39 @@ namespace ubco.hcilab.roadmap
                 });
             }
             gridObjectCollection.UpdateCollection();
-            // scrollMenu.gameObject.SetActive(true);
+
+            menuButton.OnClick.AddListener(() =>
+            {
+                InteractionManager.Instance.SetRemoving(false);
+                scrollMenu.SetActive(true);
+            });
+
+            removeButton.OnClick.AddListener(InteractionManager.Instance.ToggleRemove);
+            InteractionManager.Instance.OnRemoveRequested += (obj) =>
+            {
+                Dialog dialog = Dialog.Open(dialogPrefab, DialogButtonType.Yes | DialogButtonType.No, null, "Remove Selected Object?", true);
+                dialog.OnClosed += (result) =>
+                {
+                    if (result.Result == DialogButtonType.Yes)
+                    {
+                        Destroy(obj);
+                    }
+                };
+            };
+
+            // KLUDGE: This is not convoluted *sigh*
+            modifyButton.OnClick.AddListener(InteractionManager.Instance.ModifyModeToggle);
+            InteractionManager.Instance.OnModificationChanged += (modifying) =>
+            {
+                if (modifying)
+                {
+                    modifyButton.MainLabelText = "Moding: Turn On";
+                }
+                else
+                {
+                    modifyButton.MainLabelText = "Moding: Turn Off";
+                }
+            };
         }
     }
 }
