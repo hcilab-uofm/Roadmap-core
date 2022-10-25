@@ -85,7 +85,8 @@ namespace ubco.hcilab.roadmap
                            _placementReticle;
 
         private string _storageKey = "LocalStorageData",
-                       _currentPrefabIdentifier = null;
+                       _currentPrefabIdentifier = null,
+                       _currentPlatform = null;
 
         [SerializeField]
         private TMP_Dropdown typeOptions;
@@ -139,6 +140,8 @@ namespace ubco.hcilab.roadmap
                     RestoreSavedPlaceablesGroups();
                     break;
             }
+
+            _currentPlatform = PlatformManager.Instance.CurrentPlatform.ToString();
         }
 
         /// <summary>
@@ -483,7 +486,7 @@ namespace ubco.hcilab.roadmap
                                              group.GroupData.Altitude.ToString("F2"));
             });
 
-            LocalStorageData storageData = new LocalStorageData(groupDataList, PlatformManager.Instance.CurrentPlatform.ToString());
+            LocalStorageData storageData = new LocalStorageData(groupDataList, _currentPlatform);
             string jsonString = JsonUtility.ToJson(storageData);
             PlayerPrefs.SetString(_storageKey, jsonString);
 

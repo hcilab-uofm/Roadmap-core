@@ -124,8 +124,17 @@ namespace ubco.hcilab.roadmap
                 tapToPlace.UseDefaultSurfaceNormalOffset = false;
 
                 SolverHandler solverHandler = newObject.GetComponent<SolverHandler>();
-                solverHandler.TrackedTargetType = Microsoft.MixedReality.Toolkit.Utilities.TrackedObjectType.Head;
-
+                // switch (PlatformManager.Instance.CurrentPlatform)
+                // {
+                //     case Platform.Oculus:
+                //         solverHandler.TrackedTargetType = Microsoft.MixedReality.Toolkit.Utilities.TrackedObjectType.ControllerRay;
+                //         break;
+                //     case Platform.ARCore:
+                //         solverHandler.TrackedTargetType = Microsoft.MixedReality.Toolkit.Utilities.TrackedObjectType.Head;
+                //         break;
+                // }
+                /// Note Using ControllerRay so the MRTK Pointer will be used
+                solverHandler.TrackedTargetType = Microsoft.MixedReality.Toolkit.Utilities.TrackedObjectType.ControllerRay;
             }
 
             if (newObject.GetComponent<BoundsControl>() == null)
