@@ -9,10 +9,12 @@ namespace ubco.hcilab.roadmap
     public class VRInteractionManager : MonoBehaviour
     {
         [SerializeField] private GameObject scrollMenu;
+        [SerializeField] private GameObject syncMenu;
         [SerializeField] private GameObject menuItemPrefab;
         [SerializeField] private ButtonConfigHelper menuButton;
         [SerializeField] private ButtonConfigHelper removeButton;
         [SerializeField] private ButtonConfigHelper modifyButton;
+        [SerializeField] private ButtonConfigHelper syncButton;
         [SerializeField] private GameObject dialogPrefab;
 
         private List<PlaceableObject> placedObjects = new List<PlaceableObject>();
@@ -70,6 +72,8 @@ namespace ubco.hcilab.roadmap
                     modifyButton.MainLabelText = "Moding: Turn Off";
                 }
             };
+
+            syncButton.OnClick.AddListener(() => syncMenu.SetActive(true));
         }
     }
 }

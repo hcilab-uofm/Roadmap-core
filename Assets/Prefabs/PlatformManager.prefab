@@ -51,6 +51,7 @@ MonoBehaviour:
   ARCoreCamera: {fileID: 0}
   OculusMenu: {fileID: 0}
   ARCoreMenu: {fileID: 0}
+  PlatformSpecificManagerObject: {fileID: 0}
   OculusDetected:
     m_PersistentCalls:
       m_Calls: []
@@ -87,7 +88,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   interactionState: 0
-  touchedObject: {fileID: 0}
   run: 0
   StartButton: {fileID: 0}
   StartButtonLabel: {fileID: 0}
@@ -116,7 +116,6 @@ MonoBehaviour:
   _placingReticlePrefab: {fileID: 5016941685663849754, guid: 370fec86ea028bc4d800e46219cc8219,
     type: 3}
   _maxGroupDistance: 10
-  _buildKey: 00001
   ObjectPlaced:
     m_PersistentCalls:
       m_Calls: []
