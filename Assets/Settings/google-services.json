@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "726670413862",
+    "firebase_url": "https://roadmap-ubco-default-rtdb.firebaseio.com",
     "project_id": "roadmap-ubco",
     "storage_bucket": "roadmap-ubco.appspot.com"
   },
