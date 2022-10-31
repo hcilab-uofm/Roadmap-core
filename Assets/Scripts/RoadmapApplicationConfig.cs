@@ -15,6 +15,8 @@ namespace ubco.hcilab.roadmap
     {
         [SerializeField] public string identifier = "Data";
 
+        [HideInInspector] [SerializeField] public string groupID;
+
         [Tooltip("Changing this key will wipe all saved data first time a new build is run")]
         [SerializeField] private string _buildKey = "00001";
 
@@ -30,7 +32,7 @@ namespace ubco.hcilab.roadmap
         private RotationHandlesConfiguration rotationHandlesConfiguration;
         private TranslationHandlesConfiguration translationHandlesConfig;
 
-        public string BuildKey { get => identifier + _buildKey; private set => _buildKey = value; }
+        public string BuildKey { get => identifier + _buildKey + groupID; private set => _buildKey = value; }
 
         public PlaceableObject GetPlacable(string identifier, Transform parent=null)
         {

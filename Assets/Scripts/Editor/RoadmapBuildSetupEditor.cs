@@ -284,32 +284,4 @@ namespace ubco.hcilab.roadmap.editor
             }
         }
     }
-
-    [FilePath("UserSettings/Roadmap.state", FilePathAttribute.Location.ProjectFolder)]
-    public class RoadmapSettings : ScriptableSingleton<RoadmapSettings>
-    {
-        [SerializeField]
-        string targetPlatform = Platform.Oculus.ToString();
-        [SerializeField] public SceneAsset oculusScene;
-        [SerializeField] public SceneAsset arcoreScene;
-
-        [SerializeField]
-        List<string> m_Strings = new List<string>();
-
-        public void SetPlatformm(Platform platform)
-        {
-            targetPlatform = platform.ToString();
-            Save(true);
-        }
-
-        public Platform CurrentPlatform()
-        {
-            return Enum.Parse<Platform>(targetPlatform);
-        }
-
-        public void Save()
-        {
-            Save(true);
-        }
-    }
 }

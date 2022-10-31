@@ -39,13 +39,16 @@ namespace ubco.hcilab.roadmap
 
         private string SceneID()
         {
-            return $"{PlaceablesManager.Instance.applicationConfig.BuildKey}_{GroupID()}";
+            return $"{PlaceablesManager.Instance.applicationConfig.BuildKey}";
         }
 
         private string GroupID()
         {
-            // TODO: check if groupID is set
-            return $"{GroupConfig.instance.groupID}";
+            if (PlaceablesManager.Instance.applicationConfig.groupID == null)
+            {
+                throw new UnityException($"GroupID not set");
+            }
+            return $"{PlaceablesManager.Instance.applicationConfig.groupID}";
         }
 
         /// Run callable after verifying the scene exists in "scenes"

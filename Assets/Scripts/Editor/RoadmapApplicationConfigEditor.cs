@@ -27,6 +27,27 @@ namespace ubco.hcilab.roadmap.editor
 
         public override void OnInspectorGUI()
         {
+            if (config.groupID != RoadmapSettings.instance.groupID)
+            {
+                config.groupID = RoadmapSettings.instance.groupID;
+                EditorUtility.SetDirty(config);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+
+            EditorGUILayout.LabelField($"<color=#dddddd>Group ID:    <b>{config.groupID}</b></color>", new GUIStyle() {richText = true});
+            if (string.IsNullOrEmpty(RoadmapSettings.instance.groupID))
+            {
+                EditorGUILayout.HelpBox("Set your Group ID", MessageType.Error);
+            }
+
+            if (GUILayout.Button(new GUIContent("Set Group ID", "Make sure all members of the team use the same ID")))
+            {
+                GroupIDPopup window = (GroupIDPopup)EditorWindow.GetWindow(typeof(GroupIDPopup));
+                window.ShowPopup();
+            }
+            EditorGUILayout.Space();
+
             base.OnInspectorGUI();
             serializedObject.Update();
 
@@ -162,6 +183,31 @@ namespace ubco.hcilab.roadmap.editor
             {
                 EditorGUILayout.LabelField("Drag and drop a directory from the Project window or use 'Select folder'.");
             }
+        }
+    }
+
+    class GroupIDPopup: EditorWindow
+    {
+        private string groupID;
+
+        void OnEnable()
+        {
+            groupID = RoadmapSettings.instance.groupID;
+        }
+
+        void OnGUI()
+        {
+            EditorGUILayout.LabelField("Make sure all members of the team use the same ID");
+            groupID = EditorGUILayout.TextField(text:groupID, label:"Group ID: ");
+
+            GUI.enabled = groupID != RoadmapSettings.instance.groupID;
+            if (GUILayout.Button("Set Group ID"))
+            {
+                RoadmapSettings.instance.groupID = groupID;
+                RoadmapSettings.instance.Save();
+                this.Close();
+            }
+            GUI.enabled = true;
         }
     }
 }
