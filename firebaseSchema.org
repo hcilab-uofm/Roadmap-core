@@ -1,0 +1,48 @@
+#+begin_src python
+  {
+      "scenes":
+      {
+          # application config buildkey name and group name
+          "$scene_id":
+          {
+              "groups":
+              {
+                  "$group_id": true
+              }
+              # History of data under this scene
+              "scene_data":
+              {
+                  "$scene_data_id": "$commit_time", # same as the commit_time in the scene_data
+              }
+          }
+      },
+
+      "scene_data":{
+          # Generated from the Push() method
+          "$scene_data_id":
+          {
+              "commit_time": "timestamp",
+              "platform": "", #oculus/arcore
+              # data from the app
+              "data": {
+              }
+          }
+      }
+
+      # Track which group has access to which scene
+      "groups":
+      {
+          "$group_id":
+          {
+              "scenes"
+              {
+                  "$scene_id": true
+              }
+              "members":
+              {
+                  "$user_id": true
+              }
+          }
+      }
+  }   
+   #+end_src

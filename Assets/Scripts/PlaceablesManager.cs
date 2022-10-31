@@ -155,13 +155,13 @@ namespace ubco.hcilab.roadmap
         /// <summary>
         /// Loads all data and then checks distance to all PlaceablesGroups. Creates new Group if needed.
         /// </summary>
-        private async void RestoreSavedPlaceablesGroups()
+        private async void RestoreSavedPlaceablesGroups(LocalStorageData data=null)
         {
             if (PlatformManager.Instance.CurrentPlatform == Platform.ARCore)
             {
                 GeospatialManager.Instance.AccuracyImproved.RemoveListener(OnGeoInitCompleted);
             }
-            LoadAll();
+            LoadAll(data);
 
             await Task.Delay(1000);
 
@@ -466,6 +466,17 @@ namespace ubco.hcilab.roadmap
                 return;
             }
 
+            LocalStorageData storageData = GetLocalStorateData(true);
+            string jsonString = JsonUtility.ToJson(storageData);
+            PlayerPrefs.SetString(_storageKey, jsonString);
+
+            System.IO.File.WriteAllText(GetSaveFileLocation(), jsonString);
+            PlayerPrefs.Save();
+            _saveQueued = false;
+        }
+
+        public LocalStorageData GetLocalStorateData(bool printInfo=false)
+        {
             List<GroupData> groupDataList = new List<GroupData>();
 
             _placeablesGroups.ForEach(group =>
@@ -480,37 +491,34 @@ namespace ubco.hcilab.roadmap
                         group.GroupData.PlaceableDataList.Add(placeable.GetData());
                 });
 
-                Debug.Log("Saved Group + " + group.GroupData.PlaceableDataList.Count + " Placeables @ " +
-                                             group.GroupData.Latitude.ToString("F2") + " | " +
-                                             group.GroupData.Longitude.ToString("F2") + " | " +
-                                             group.GroupData.Altitude.ToString("F2"));
+                Debug.Log("Processing Group + " + group.GroupData.PlaceableDataList.Count + " Placeables @ " +
+                          group.GroupData.Latitude.ToString("F2") + " | " +
+                          group.GroupData.Longitude.ToString("F2") + " | " +
+                          group.GroupData.Altitude.ToString("F2"));
             });
 
-            LocalStorageData storageData = new LocalStorageData(groupDataList, _currentPlatform);
-            string jsonString = JsonUtility.ToJson(storageData);
-            PlayerPrefs.SetString(_storageKey, jsonString);
-
-            System.IO.File.WriteAllText(GetSaveFileLocation(), jsonString);
-            PlayerPrefs.Save();
-            _saveQueued = false;
+            return new LocalStorageData(groupDataList, _currentPlatform);
         }
 
         /// <summary>
         /// Load and deserialize previous session data from Player Prefs
         /// </summary>
-        public void LoadAll()
+        public void LoadAll(LocalStorageData storageData = null)
         {
-            if (!PlayerPrefs.HasKey(_storageKey))
+            if (storageData == null)
             {
-                Debug.Log("Nothing to load");
-                GroupLoaded?.Invoke(null);
-                _loadComplete = true;
-                AllGroupsLoaded?.Invoke(null);
-                return;
-            }
+                if (!PlayerPrefs.HasKey(_storageKey))
+                {
+                    Debug.Log("Nothing to load");
+                    GroupLoaded?.Invoke(null);
+                    _loadComplete = true;
+                    AllGroupsLoaded?.Invoke(null);
+                    return;
+                }
 
-            // TODO: Use storageData.LastWrittenPlatform to tranlate between coordinate spaces;
-            LocalStorageData storageData = JsonUtility.FromJson<LocalStorageData>(PlayerPrefs.GetString(_storageKey));
+                // TODO: Use storageData.LastWrittenPlatform to tranlate between coordinate spaces;
+                storageData = JsonUtility.FromJson<LocalStorageData>(PlayerPrefs.GetString(_storageKey));
+            }
 
             storageData.Groups.ForEach(groupData =>
             {
@@ -549,6 +557,13 @@ namespace ubco.hcilab.roadmap
             }
 
             _groupIndex = 0;
+        }
+
+        public void LoadFromLocalStorageData(LocalStorageData data)
+        {
+            DestroyAll();
+            RestoreSavedPlaceablesGroups(data);
+            SaveImmediate();
         }
 
         private void OnApplicationPause(bool paused)
