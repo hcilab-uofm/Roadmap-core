@@ -8,7 +8,7 @@ namespace ubco.hcilab.roadmap
     {
         // FIXME: This can cause issues with polymorphism
         /// <inheritdoc/>
-        public void OnPointerClicked(MixedRealityPointerEventData eventdata)
+        public new void OnPointerClicked(MixedRealityPointerEventData eventdata)
         {
             if (!IsBeingPlaced)
             {
