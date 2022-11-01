@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8640453180476452962}
   - component: {fileID: 8640453180476452961}
   - component: {fileID: 8640453180476452960}
+  - component: {fileID: 802820405738281057}
   m_Layer: 0
   m_Name: ARPlatformManager
   m_TagString: Untagged
@@ -81,6 +82,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87c05f17057627744875152891a56d67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  typeOptions: {fileID: 0}
   ARPlaneManager: {fileID: 0}
   ARRaycastManager: {fileID: 0}
   ARPlaneChanged:
@@ -99,3 +101,15 @@ MonoBehaviour:
   _cullBySizeOnHit: 0
   _cullAllButLargestPlane: 0
   _screenTapLowerCutoff: 0.15
+--- !u!114 &802820405738281057
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8640453180476452967}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1ebb8fce69746345a4eb92a92c9f4cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
