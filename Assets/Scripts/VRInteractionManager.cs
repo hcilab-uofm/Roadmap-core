@@ -17,7 +17,6 @@ namespace ubco.hcilab.roadmap
         [SerializeField] private ButtonConfigHelper syncButton;
         [SerializeField] private GameObject dialogPrefab;
 
-        private List<PlaceableObject> placedObjects = new List<PlaceableObject>();
         // Start is called before the first frame update
         void Start()
         {
@@ -32,7 +31,6 @@ namespace ubco.hcilab.roadmap
                 buttonConfigHelper.OnClick.AddListener(() => {
                     scrollMenu.SetActive(false);
                     PlaceableObject placableObject= PlaceablesManager.Instance.applicationConfig.GetPlacable(item);
-                    placedObjects.Add(placableObject);
                     placableObject.Init(item.identifier);
 
                     placableObject.StartPlacement();

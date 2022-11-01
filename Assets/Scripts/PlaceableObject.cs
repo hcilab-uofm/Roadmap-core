@@ -103,6 +103,7 @@ namespace ubco.hcilab.roadmap
                 InteractionManager.Instance.SetInteractionState(InteractionState.None);
                 FinalizePlacement();
                 PlaceablesManager.Instance.ObjectPlaced?.Invoke(gameObject);
+                this._placeableData.Updated();
 
                 PlaceablesManager.Instance.Save();
             };

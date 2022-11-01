@@ -8,12 +8,21 @@ namespace ubco.hcilab
         public string PrefabIdentifier;
         public Pose LocalPose;
         public string AuxData;
+        public string identifier;
+        public long lastUpdate;
 
         public PlaceableObjectData(string prefabIdentifier, Pose localPose, string auxData = null)
         {
             PrefabIdentifier = prefabIdentifier;
             LocalPose = localPose;
             AuxData = auxData;
+            lastUpdate = System.DateTime.Now.Ticks;
+            identifier = $"{prefabIdentifier}_{lastUpdate}";
+        }
+
+        public void Updated()
+        {
+            lastUpdate = System.DateTime.Now.Ticks;
         }
     }
 }
