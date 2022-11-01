@@ -2,6 +2,7 @@ using System.Linq;
 using Firebase.Database;
 using System.Collections.Generic;
 using UnityEngine;
+using Newtonsoft.Json;
 
 namespace ubco.hcilab.roadmap
 {
@@ -33,7 +34,6 @@ namespace ubco.hcilab.roadmap
                         DataSnapshot snapshot = task.Result;
                         withSnapshot(snapshot);
                     }
-
                 });
         }
 
@@ -44,7 +44,7 @@ namespace ubco.hcilab.roadmap
 
         private string GroupID()
         {
-            if (PlaceablesManager.Instance.applicationConfig.groupID == null)
+            if (string.IsNullOrEmpty(PlaceablesManager.Instance.applicationConfig.groupID))
             {
                 throw new UnityException($"GroupID not set");
             }
@@ -55,15 +55,11 @@ namespace ubco.hcilab.roadmap
         private void CheckSceneInScenes(System.Action callable)
         {
             RunWithReference($"/{DB_SCENES}/{SceneID()}", (snapshot) =>
-            {    
-                if (snapshot == null)
+            {
+                if (snapshot == null || snapshot.Value == null)
                 {
-                    // create scene and call
-                    SceneInfo sceneInfo = new SceneInfo();
-                    sceneInfo.groups[GroupID()] = true;
-
                     Dictionary<string, object> childUpdates = new Dictionary<string, object>();
-                    childUpdates[$"/{DB_SCENES}/{SceneID()}"] = sceneInfo;
+                    childUpdates[$"/{DB_SCENES}/{SceneID()}/{DB_GROUPS}/{GroupID()}"] = true;
                     childUpdates[$"/{DB_GROUPS}/{GroupID()}/{DB_SCENES}/{SceneID()}"] = true;
 
                     dbReference.UpdateChildrenAsync(childUpdates).ContinueWith(task =>
@@ -121,12 +117,12 @@ namespace ubco.hcilab.roadmap
                 }
                 else
                 {
-                    Dictionary<string, long> sceneData = (Dictionary<string, long>)snapshot.Value;
+                    Dictionary<string, long> sceneData = JsonConvert.DeserializeObject<Dictionary<string, long>>(snapshot.GetRawJsonValue());
                     string sceneDataId = sceneData.OrderByDescending(kvp => kvp.Key).First().Key;
                     RunWithReference($"/{DB_SCENE_DATA}/{sceneDataId}", (snapshot) =>
                     {
                         RemoteStorateData remoteData = JsonUtility.FromJson<RemoteStorateData>(snapshot.GetRawJsonValue());
-                        PlaceablesManager.Instance.LoadFromLocalStorageData(remoteData.data);
+                        PlaceablesManager.Instance.LoadFromLocalStorageData(remoteData.GetData());
                     });
                 }
             });
@@ -138,19 +134,19 @@ namespace ubco.hcilab.roadmap
     {
         public long commit_time;
         public string platform;
-        public LocalStorageData data;
+        public string data;// LocalStorageData
 
         public RemoteStorateData(long commit_time, string platform, LocalStorageData data)
         {
             this.commit_time = commit_time;
-            this.data = data;
+            this.data = JsonUtility.ToJson(data);
             this.platform = platform;
         }
 
         public RemoteStorateData(long commit_time, LocalStorageData data)
         {
             this.commit_time = commit_time;
-            this.data = data;
+            this.data = JsonUtility.ToJson(data);
             this.platform = data.LastWrittenPlatform;
         }
 
@@ -158,15 +154,20 @@ namespace ubco.hcilab.roadmap
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
             result["commit_time"] = commit_time;
-            result["data"] = JsonUtility.ToJson(data);
+            result["data"] = data;
             result["platform"] = platform;
             return result;
         }
+
+        public LocalStorageData GetData()
+        {
+            return JsonUtility.FromJson<LocalStorageData>(data);
+        }
     }
 
-    public class SceneInfo
+    public class SceneData
     {
-        public Dictionary<string, bool> groups;
-        public Dictionary<string, bool> scene_data;
+        public string sceneId;
+        public long commit_time;
     }
 }

@@ -12,7 +12,8 @@
     "com.unity.xr.arcore": "4.2.6",
     "com.unity.xr.arfoundation": "4.2.6",
     "com.unity.xr.arkit": "4.1.5",
-    "com.unity.xr.oculus": "3.0.2"
+    "com.unity.xr.oculus": "3.0.2",
+    "com.unity.nuget.newtonsoft-json": "3.0.1"
   },
   "author": {
     "name": "hcilab-ubco",

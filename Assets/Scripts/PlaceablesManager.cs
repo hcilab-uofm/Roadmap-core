@@ -88,6 +88,8 @@ namespace ubco.hcilab.roadmap
                        _currentPrefabIdentifier = null,
                        _currentPlatform = null;
 
+        private LocalStorageData newLocalStorageData;
+
         [SerializeField]
         private TMP_Dropdown typeOptions;
         
@@ -561,9 +563,9 @@ namespace ubco.hcilab.roadmap
 
         public void LoadFromLocalStorageData(LocalStorageData data)
         {
-            DestroyAll();
-            RestoreSavedPlaceablesGroups(data);
-            SaveImmediate();
+            /// This is called from the serverthread, need to updaate in mainthread,
+            /// hence saving and checking in update.
+            newLocalStorageData = data;
         }
 
         private void OnApplicationPause(bool paused)
@@ -589,5 +591,15 @@ namespace ubco.hcilab.roadmap
             //Application.OpenURL("https://lyonscrawl.github.io/");
         }
 
+        void Update()
+        {
+            if (newLocalStorageData != null)
+            {
+                DestroyAll();
+                RestoreSavedPlaceablesGroups(newLocalStorageData);
+                SaveImmediate();
+                newLocalStorageData = null;
+            }
+        }
     }
 }

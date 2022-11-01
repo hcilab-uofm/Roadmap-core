@@ -20,7 +20,8 @@
     "overrideReferences": true,
     "precompiledReferences": [
         "Firebase.Database.dll",
-        "Firebase.App.dll"
+        "Firebase.App.dll",
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": true,
     "defineConstraints": [],
