@@ -174,24 +174,27 @@ namespace ubco.hcilab.roadmap
         /// </summary>
         protected void SaveData()
         {
-            switch (PlatformManager.Instance.CurrentPlatform)
+            if (_groupData == null)
             {
-                case Platform.ARCore:
-                    _groupData = new GroupData(GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Latitude,
-                                               GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Longitude,
-                                               GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Altitude,
-                                               GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Heading,
-                                               new List<PlaceableObjectData>());
-                    break;
-                case Platform.Oculus:
-                    _groupData = new GroupData(Camera.main.transform.position.x,
-                                               Camera.main.transform.position.z,
-                                               Camera.main.transform.position.y,
-                                               0, // TODO: Recalcuate this with Vector3.SignedAngle ?
-                                               new List<PlaceableObjectData>());
-                    break;
-                default:
-                    throw new NotImplementedException();
+                switch (PlatformManager.Instance.CurrentPlatform)
+                {
+                    case Platform.ARCore:
+                        _groupData = new GroupData(GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Latitude,
+                                                   GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Longitude,
+                                                   GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Altitude,
+                                                   GeospatialManager.Instance.EarthManager.CameraGeospatialPose.Heading,
+                                                   new List<PlaceableObjectData>());
+                        break;
+                    case Platform.Oculus:
+                        _groupData = new GroupData(Camera.main.transform.position.x,
+                                                   Camera.main.transform.position.z,
+                                                   Camera.main.transform.position.y,
+                                                   0, // TODO: Recalcuate this with Vector3.SignedAngle ?
+                                                   new List<PlaceableObjectData>());
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
             }
 
             if (_placeables.Count > 0) PlaceablesManager.Instance.Save();

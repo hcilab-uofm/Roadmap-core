@@ -87,7 +87,7 @@ namespace ubco.hcilab.roadmap
             CheckSceneInScenes(() =>
             {
                 string key = dbReference.Child(DB_SCENE_DATA).Push().Key;
-                RemoteStorateData sceneData = new RemoteStorateData(System.DateTime.Now.Ticks, data);
+                RemoteStorageData sceneData = new RemoteStorageData(System.DateTime.Now.Ticks, data);
 
                 Dictionary<string, object> childUpdates = new Dictionary<string, object>();
                 childUpdates[$"/{DB_SCENE_DATA}/{key}"] = sceneData.ToDictionary();
@@ -97,9 +97,99 @@ namespace ubco.hcilab.roadmap
             });
         }
 
-        // TODO
         public void SyncWithRemote()
         {
+            ProcessRemoteStorageData((remoteDataStorage) =>
+            {
+                LocalStorageData remoteData = remoteDataStorage.GetData();
+                LocalStorageData localData = PlaceablesManager.Instance.GetLocalStorateData();
+
+                Dictionary<string, GroupData> remoteDataDict = remoteData.Groups.ToDictionary(item => item.identifier);
+                Dictionary<string, GroupData> localDataDict = localData.Groups.ToDictionary(item => item.identifier);
+
+                Dictionary<string, PlaceableObjectData> remotePlaceables, localPlaceables;
+                Dictionary<string, byte> groupStates = new Dictionary<string, byte>(); // 1 - remote, 2 - local, 3 - both
+
+                Dictionary<string, GroupData> groupData = new Dictionary<string, GroupData>();
+
+                localData.Groups.ForEach(_group =>
+                {
+                    /// Combine data that has common keys in both
+                    if (remoteDataDict.ContainsKey(_group.identifier))
+                    {
+                        localPlaceables = _group.PlaceableDataList.ToDictionary(item => item.identifier);
+                        remotePlaceables = remoteDataDict[_group.identifier].PlaceableDataList.ToDictionary(item => item.identifier);
+
+                        /// Also have to decide which data of the group to use.
+                        /// Setting up to select based on the one with the placeable with the latest update.
+                        long remoteLatestUpdate = remotePlaceables.Select(x => x.Value.lastUpdate).Max();
+                        bool useRemote = true;
+
+                        foreach(KeyValuePair<string, PlaceableObjectData> localPlaceableKVP in localPlaceables)
+                        {
+                            /// When a plceable is in both, pick the one that has the largest timestamp
+                            if (remotePlaceables.ContainsKey(localPlaceableKVP.Key))
+                            {
+                                if (localPlaceableKVP.Value.lastUpdate > remotePlaceables[localPlaceableKVP.Key].lastUpdate)
+                                {
+                                    remotePlaceables[localPlaceableKVP.Key] = localPlaceableKVP.Value;
+                                }
+                            }
+                            /// Add placeables only in local
+                            else
+                            {
+                                remotePlaceables[localPlaceableKVP.Key] = localPlaceableKVP.Value;
+                            }
+
+                            /// Checking if there is a local updated later than remoteLatestUpdate
+                            if (localPlaceableKVP.Value.lastUpdate > remoteLatestUpdate)
+                            {
+                                useRemote = false;
+                            }
+                        }
+
+                        /// Selecting based on the one with the placeable with the latest update.
+                        if (useRemote)
+                        {
+                            groupData[_group.identifier] = remoteDataDict[_group.identifier];
+                            groupStates[_group.identifier] = 1;
+                        }
+                        else
+                        {
+                            groupData[_group.identifier] = _group;
+                            groupStates[_group.identifier] = 2;
+                        }
+
+                        /// Making sure the PlaceableDataList is the combined one
+                        groupData[_group.identifier].PlaceableDataList = remotePlaceables.Values.ToList();
+                    }
+                    /// _group is only in localData, add as is
+                    else
+                    {
+                        groupData[_group.identifier] = _group;
+                        groupStates[_group.identifier] = 2;
+                    }
+                });
+
+                /// Adding groups only in remote
+                remoteData.Groups.ForEach(_group =>
+                {
+                    groupData[_group.identifier] = _group;
+                    groupStates[_group.identifier] = 1;
+                });
+
+                Dictionary<string, GroupData> finalData = new Dictionary<string, GroupData>();
+
+                /// if the platforms are different transfrom data
+                if (remoteData.LastWrittenPlatform != localData.LastWrittenPlatform)
+                {
+                    // TODO: Figure out how to use groupStats to convert between coord systems
+                }
+
+                /// localData has the current platform set as LastWrittenPlatform
+                LocalStorageData result = new LocalStorageData(finalData.Values.ToList(), localData.LastWrittenPlatform);
+                PlaceablesManager.Instance.LoadFromLocalStorageData(result);
+            });
         }
 
         public void OverwriteRemote()
@@ -108,6 +198,14 @@ namespace ubco.hcilab.roadmap
         }
 
         public void OverwriteLocal()
+        {
+            ProcessRemoteStorageData((remoteData) =>
+            {
+                PlaceablesManager.Instance.LoadFromLocalStorageData(remoteData.GetData());
+            });
+        }
+
+        public void ProcessRemoteStorageData(System.Action<RemoteStorageData> callback)
         {
             RunWithReference($"/{DB_SCENES}/{SceneID()}/{DB_SCENE_DATA}", (snapshot) =>
             {
@@ -121,8 +219,8 @@ namespace ubco.hcilab.roadmap
                     string sceneDataId = sceneData.OrderByDescending(kvp => kvp.Key).First().Key;
                     RunWithReference($"/{DB_SCENE_DATA}/{sceneDataId}", (snapshot) =>
                     {
-                        RemoteStorateData remoteData = JsonUtility.FromJson<RemoteStorateData>(snapshot.GetRawJsonValue());
-                        PlaceablesManager.Instance.LoadFromLocalStorageData(remoteData.GetData());
+                        RemoteStorageData remoteData = JsonUtility.FromJson<RemoteStorageData>(snapshot.GetRawJsonValue());
+                        callback(remoteData);
                     });
                 }
             });
@@ -130,20 +228,20 @@ namespace ubco.hcilab.roadmap
     }
 
     [System.Serializable]
-    public class RemoteStorateData
+    public class RemoteStorageData
     {
         public long commit_time;
         public string platform;
         public string data;// LocalStorageData
 
-        public RemoteStorateData(long commit_time, string platform, LocalStorageData data)
+        public RemoteStorageData(long commit_time, string platform, LocalStorageData data)
         {
             this.commit_time = commit_time;
             this.data = JsonUtility.ToJson(data);
             this.platform = platform;
         }
 
-        public RemoteStorateData(long commit_time, LocalStorageData data)
+        public RemoteStorageData(long commit_time, LocalStorageData data)
         {
             this.commit_time = commit_time;
             this.data = JsonUtility.ToJson(data);

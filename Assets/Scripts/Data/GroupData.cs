@@ -10,6 +10,7 @@ namespace ubco.hcilab
         public double Altitude;
         public double Heading;
         public List<PlaceableObjectData> PlaceableDataList;
+        public string identifier;
 
         public GroupData(double latitude, double longitude, double altitude, double heading, List<PlaceableObjectData> placeableDataList)
         {
@@ -18,6 +19,7 @@ namespace ubco.hcilab
             Altitude = altitude;
             Heading = heading;
             PlaceableDataList = placeableDataList;
+            identifier = $"group_{System.Guid.NewGuid().ToString()}";
         }
     }
 }

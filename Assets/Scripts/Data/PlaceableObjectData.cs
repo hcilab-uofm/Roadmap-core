@@ -17,7 +17,7 @@ namespace ubco.hcilab
             LocalPose = localPose;
             AuxData = auxData;
             lastUpdate = System.DateTime.Now.Ticks;
-            identifier = $"{prefabIdentifier}_{lastUpdate}";
+            identifier = $"{prefabIdentifier}_{System.Guid.NewGuid().ToString()}";
         }
 
         public void Updated()

@@ -535,12 +535,12 @@ namespace ubco.hcilab.roadmap
                     placeable.Restore(placeableData, group);
                 });
 
-                Debug.Log("Loaded Group + " + _placeablesGroups[_groupIndex].Placeables.Count + " Placeables @ " +
+                Debug.Log("Loaded Group + " + group.Placeables.Count + " Placeables @ " +
                                               groupData.Latitude.ToString("F2") + " | " +
                                               groupData.Longitude.ToString("F2") + " | " +
                                               groupData.Altitude.ToString("F2"));
 
-                GroupLoaded?.Invoke(_placeablesGroups[_groupIndex]);
+                GroupLoaded?.Invoke(group);
             });
 
             _loadComplete = true;
