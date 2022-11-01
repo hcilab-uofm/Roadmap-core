@@ -32,7 +32,7 @@ Note that the guides are written primarily for android, but they apply to iOS bu
   - Update project with default URP settings: `Roadmap` > `Setup URP default assets`
 ![URP default settings menu item](Media/figures/menu_urp_default.png)
   - Update the MRTK shaders: `Mixed Reality` > `Toolkit` > `Utilities` > `Upgrade MRTK Standard Shaders for Universal Render Pipeline`
-- Follow instructions in [this issue comment](https://github.com/microsoft/MixedRealityToolkit-Unity/issues/10449#issuecomment-1111163353) if you get the following error when building:
+- Follow instructions in [this issue comment](https://github.com/microsoft/MixedRealityToolkit-Unity/issues/10449#issuecomment-1295233907) if you get the following error when building:
 ```sh
 Shader error in 'Mixed Reality Toolkit/Standard'
 ```
