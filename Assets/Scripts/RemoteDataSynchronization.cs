@@ -99,10 +99,11 @@ namespace ubco.hcilab.roadmap
 
         public void SyncWithRemote()
         {
+            LocalStorageData localData = PlaceablesManager.Instance.GetLocalStorateData();
+
             ProcessRemoteStorageData((remoteDataStorage) =>
             {
                 LocalStorageData remoteData = remoteDataStorage.GetData();
-                LocalStorageData localData = PlaceablesManager.Instance.GetLocalStorateData();
 
                 Dictionary<string, GroupData> remoteDataDict = remoteData.Groups.ToDictionary(item => item.identifier);
                 Dictionary<string, GroupData> localDataDict = localData.Groups.ToDictionary(item => item.identifier);
@@ -178,8 +179,6 @@ namespace ubco.hcilab.roadmap
                     groupStates[_group.identifier] = 1;
                 });
 
-                Dictionary<string, GroupData> finalData = new Dictionary<string, GroupData>();
-
                 /// if the platforms are different transfrom data
                 if (remoteData.LastWrittenPlatform != localData.LastWrittenPlatform)
                 {
@@ -187,8 +186,12 @@ namespace ubco.hcilab.roadmap
                 }
 
                 /// localData has the current platform set as LastWrittenPlatform
-                LocalStorageData result = new LocalStorageData(finalData.Values.ToList(), localData.LastWrittenPlatform);
+                LocalStorageData result = new LocalStorageData(groupData.Values.ToList(), localData.LastWrittenPlatform);
+
+                /// Write local data
                 PlaceablesManager.Instance.LoadFromLocalStorageData(result);
+                /// Write remote data
+                SaveSceneData(result);
             });
         }
 
