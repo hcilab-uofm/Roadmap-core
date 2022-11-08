@@ -218,6 +218,11 @@ namespace ubco.hcilab.roadmap.editor
             startInfo.RedirectStandardOutput = true;
             startInfo.RedirectStandardError = true;
 
+            RunProcess(startInfo);
+        }
+
+        public static void RunProcess(ProcessStartInfo startInfo)
+        {
             StringBuilder outputStringBuilder = new StringBuilder("");
             StringBuilder errorStringBuilder = new StringBuilder("");
 
@@ -267,6 +272,7 @@ namespace ubco.hcilab.roadmap.editor
             outputStringBuilder = null;
             errorStringBuilder = null;
 
+            UnityEngine.Debug.Log($"Ran:: {startInfo.FileName} {startInfo.Arguments}");
             if (!string.IsNullOrEmpty(errorString))
             {
                 if (errorString.Contains("Warning"))
@@ -280,7 +286,11 @@ namespace ubco.hcilab.roadmap.editor
             }
             else
             {
-                UnityEngine.Debug.Log("Done deploying");
+                if (!string.IsNullOrEmpty(outputString))
+                {
+                    UnityEngine.Debug.Log(outputString);
+                }
+                UnityEngine.Debug.Log("Done!");
             }
         }
     }

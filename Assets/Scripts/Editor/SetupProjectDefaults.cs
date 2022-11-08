@@ -1,6 +1,8 @@
+using System.Diagnostics;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace ubco.hcilab.roadmap.editor
 {
@@ -34,6 +36,30 @@ namespace ubco.hcilab.roadmap.editor
             else
             {
                 Debug.LogError($"Filed copying firebase config (GoogleService-Info.plist)");
+            }
+        }
+
+        [MenuItem("Roadmap/Apply MRTK shader patch", false, 200)]
+        static void ApplyPatch()
+        {
+            string patchFile = Path.Join(Application.dataPath, "../MRTK_StandardShader_fix.patch");
+            if (File.Exists(patchFile) || AssetDatabase.CopyAsset("Packages/ubc.ok.hcilab.roadmap-unity/Media/MRTK_StandardShader_fix.patch", "MRTK_StandardShader_fix.patch"))
+            {
+                ProcessStartInfo startInfo = new ProcessStartInfo("git", $"apply {patchFile}");
+                startInfo.WorkingDirectory = Path.GetDirectoryName(patchFile);
+                startInfo.CreateNoWindow = true;
+                startInfo.UseShellExecute = false;
+                startInfo.WindowStyle = ProcessWindowStyle.Normal;
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
+
+                RoadmapBuildSetupEditor.RunProcess(startInfo);
+                Debug.Log($"Deleting patch file.");
+                File.Delete(patchFile);
+            }
+            else
+            {
+                Debug.LogError($"Failed to apply patch");
             }
         }
     }
