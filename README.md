@@ -40,7 +40,7 @@ Shader error in 'Mixed Reality Toolkit/Standard'
 ```
     - Use `Roadmap` > `Apply MRTK shader patch` to apply patch:
 ![mrtk patch](Media/figures/menu_apply_mrtk_patch.png)
-    - The above is a fix following instructions in [this issue comment](https://github.com/microsoft/MixedRealityToolkit-Unity/issues/10449#issuecomment-1111163353). The above menu item applys the patch [Media/MRTK_StandardShader_fix.patch](Media/MRTK_StandardShader_fix.patch)
+    - The above is a fix following instructions in [this issue comment](https://github.com/microsoft/MixedRealityToolkit-Unity/issues/10449#issuecomment-1295233907). The above menu item applys the patch [Media/MRTK_StandardShader_fix.patch](Media/MRTK_StandardShader_fix.patch)
 
 ## Usage
 
