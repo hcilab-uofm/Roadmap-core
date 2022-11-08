@@ -28,15 +28,19 @@ Note that the guides are written primarily for android, but they apply to iOS bu
 ![add package url](Media/figures/paste_git_url.png)
   - The link can be found in on github:
 ![copy package url](Media/figures/copy_git_url.png)
-- Once it finishes installing, setup URP. Optionally, you may use the profiles shipped with this package. In the project windows it can be found in `Pacakges` > `roadmap-core` > `Assets` > `Essentials` > `Settings`
+- Configure the defaults of the project by selecting `Roadmap` > `Setup URP default assets`
+![project defaults](Media/figures/menu_setup_proj_default.png)
+- Setup URP. Optionally, you may use the profiles shipped with this package. In the project windows it can be found in `Pacakges` > `roadmap-core` > `Assets` > `Essentials` > `Settings`
   - Update project with default URP settings: `Roadmap` > `Setup URP default assets`
 ![URP default settings menu item](Media/figures/menu_urp_default.png)
   - Update the MRTK shaders: `Mixed Reality` > `Toolkit` > `Utilities` > `Upgrade MRTK Standard Shaders for Universal Render Pipeline`
-- Follow instructions in [this issue comment](https://github.com/microsoft/MixedRealityToolkit-Unity/issues/10449#issuecomment-1111163353) if you get the following error when building:
+- If you get the following error when building:
 ```sh
 Shader error in 'Mixed Reality Toolkit/Standard'
 ```
-
+    - Use `Roadmap` > `Apply MRTK shader patch` to apply patch:
+![mrtk patch](Media/figures/menu_apply_mrtk_patch.png)
+    - The above is a fix following instructions in [this issue comment](https://github.com/microsoft/MixedRealityToolkit-Unity/issues/10449#issuecomment-1111163353). The above menu item applys the patch [Media/MRTK_StandardShader_fix.patch](Media/MRTK_StandardShader_fix.patch)
 
 ## Usage
 
@@ -60,6 +64,17 @@ To use the configuration in the builds, you can add them to the `PlaceablesManag
 
 To see how the respective AR (mobile) and VR (oculus quest) scenes would be configured, please see the AR and VR scenes available with the pacakge (see below). The necessary prefabs are also available in the package. Instead of configuring your own scenes, you can duplicate them into the project to add new functionalies. 
 ![ar vr scene in package](Media/figures/AR_VR_scenes.png)
+
+### Synchronization
+To synchronize data between devices/group members:
+- Make sure to use the same group ID, which can be set by clicking `Set Group ID` in the config (See above images for reference). 
+- Make sure the same prefabs and the corresponding config files are used before building the application on either end.
+
+Note that the scene data is synchronize using a unique ID created from the `groupID`, the `identifier` of the config and the `BuildID`. If these three values are the same between the devices/group members, you sync data between them.
+
+You may use the `BuildID` as a very crude version control system:
+- When you have a scene you want to version, make sure the data is pushed to the remote (using `sync` or `overwrite remote` options in the built application).
+- Build the application with a new `BuildID` to test a different setup.
 
 ### Adding models
 You can add/remove models through the inspector of a corresponding config (see above images) under `Placeables` using the `+` and `-` buttons. Each entry in `Placeables` should have a unique name and the corresponding prefab object. If there are duplicate entries (same identifier used or same prefab used), you will get a warning message and the option to remove duplicates along with the option to fix them.
