@@ -150,6 +150,9 @@ namespace ubco.hcilab.roadmap
                         }
 
                         /// Selecting based on the one with the placeable with the latest update.
+                        /// NOTE: The placeable is relative to the group origin, hence,
+                        /// the group origin is the one that has to have the coordinate transformation
+                        /// placeable data should be usable as is
                         if (useRemote)
                         {
                             groupData[_group.identifier] = remoteDataDict[_group.identifier];

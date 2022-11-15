@@ -186,10 +186,14 @@ namespace ubco.hcilab.roadmap
                                                    new List<PlaceableObjectData>());
                         break;
                     case Platform.Oculus:
-                        _groupData = new GroupData(Camera.main.transform.position.x,
-                                                   Camera.main.transform.position.z,
+                        /// -z is north, x is west
+                        /// heading is the camera's forward vector projected on the xz plane (y is the plane normal vector)
+                        float heading = Vector3.Angle(-Vector3.forward,
+                                                      Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up));
+                        _groupData = new GroupData(Camera.main.transform.position.z,
+                                                   Camera.main.transform.position.x,
                                                    Camera.main.transform.position.y,
-                                                   0, // TODO: Recalcuate this with Vector3.SignedAngle ?
+                                                   heading,
                                                    new List<PlaceableObjectData>());
                         break;
                     default:

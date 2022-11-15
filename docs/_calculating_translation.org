@@ -1,0 +1,447 @@
+# -*- org-download-image-dir: "figures"; -*-
+#+PROPERTY: header-args:jupyter-python :kernel generic-jupyter-env-seaborn  :exports both
+
+#+begin_src jupyter-python :exports both  :results none
+  import numpy as np
+  import sys
+  from itertools import combinations
+  np.set_printoptions(suppress=True)
+#+end_src
+
+* Calculate transformation
+:PROPERTIES:
+:ID:       d03fdddf-3f02-4e90-aeb3-18f074e8a680
+:END:
+
+- ~p1~ is the north-west corner of the H parking lot
+- ~p2~ is the north-east corner of the UBCO inovation p1 parking lot
+- ~p3~ is the north-east corner of the H parking lot
+- ~p4~ is the north-west corner of the parking lot of CareRx
+- ~p5~ is the south-west corner of the parking lot of kelowna fruitstand and cafe
+- For real world, the markers below were used. For the VR coords, place to objects on those corners using isomatric view and get the x, z values
+
+#+DOWNLOADED: screenshot @ 2022-11-14 14:48:02
+[[file:figures/d03fdddf-3f02-4e90-aeb3-18f074e8a680/2022-11-14_14-48-02_screenshot.png]]
+
+
+#+begin_src jupyter-python :exports both  :results none
+  # lat, long
+  rl_p1 = np.array([49.9431674509879,   -119.39242220134821])
+  rl_p2 = np.array([49.94789212843971,  -119.38928227477919])
+  rl_p3 = np.array([49.942804861681616, -119.39094403476872])
+  rl_p4 = np.array([49.948048090987776, -119.38700155779911])
+  rl_p5 = np.array([49.94464602175886,  -119.38640772758936])
+
+  # z, x
+  vr_p1 = np.array([421.1, 223.1])
+  vr_p2 = np.array([-398, -121.2])
+  vr_p3 = np.array([482, 63.2])
+  vr_p4 = np.array([-425.3, -368.6])
+  vr_p5 = np.array([163.7, -436.8])
+
+#+end_src
+
+Calculating the scale
+#+begin_src jupyter-python :exports both
+  rl_magnitude = np.linalg.norm(rl_p1 - rl_p2)
+  vr_vec_magnitude = np.linalg.norm(vr_p1 - vr_p2)
+
+  vr_to_rl_scale = rl_magnitude / vr_vec_magnitude
+  print(f"{vr_to_rl_scale:.12f}")
+#+end_src
+
+#+RESULTS:
+: 0.000006384656
+
+Testing the scale is correct
+#+begin_src jupyter-python :exports both
+  print((vr_p1 - vr_p2) * vr_to_rl_scale)
+  print(rl_p1 - rl_p2)
+#+end_src
+
+#+RESULTS:
+: [0.00522967 0.00219824]
+: [-0.00472468 -0.00313993]
+
+- The difference is suppose to be equal, meaning, there is a different scaling factor for both axis
+
+Calculating separate scale for x and y
+#+begin_src jupyter-python :exports both
+  vr_to_rl_scale_sep = np.abs(rl_p1 - rl_p2) / np.abs(vr_p1 - vr_p2)
+  np.savetxt(sys.stdout, vr_to_rl_scale_sep, '%.10f')
+#+end_src
+
+#+RESULTS:
+: 0.0000057681
+: 0.0000091197
+
+Testing the axis scales
+#+begin_src jupyter-python :exports both
+  print((vr_p1 - vr_p2) * vr_to_rl_scale_sep)
+  print(rl_p1 - rl_p2)
+#+end_src
+
+#+RESULTS:
+: [0.00472468 0.00313993]
+: [-0.00472468 -0.00313993]
+
+
+- The above is what I was expecting
+
+Calculate the translation
+Note that the axis are flipped, becuase lat = -z in unity and log = -x in unity
+
+#+begin_src jupyter-python :exports both
+  print(vr_p1 * vr_to_rl_scale_sep * [-1, -1])
+  print(rl_p1)
+  vr_to_rl_translation = rl_p1 - vr_p1 * vr_to_rl_scale_sep * [-1, -1]
+  print(vr_to_rl_translation, rl_p2 - vr_p2 * vr_to_rl_scale_sep * [-1, -1])
+#+end_src
+
+#+RESULTS:
+: [-0.00242896 -0.00203461]
+: [  49.94316745 -119.3924222 ]
+: [  49.94559641 -119.39038759] [  49.94559641 -119.39038759]
+
+Testing the translations
+#+begin_src jupyter-python :exports both
+  print(vr_p2 * vr_to_rl_scale_sep * [-1, -1] + vr_to_rl_translation)
+  print(rl_p2)
+  print()
+  print(vr_p1 * vr_to_rl_scale_sep * [-1, -1] + vr_to_rl_translation)
+  print(rl_p1)
+#+end_src
+
+#+RESULTS:
+: [  49.94789213 -119.38928227]
+: [  49.94789213 -119.38928227]
+: 
+: [  49.94316745 -119.3924222 ]
+: [  49.94316745 -119.3924222 ]
+
+
+** Calculate transformation matrix
+
+#+begin_src jupyter-python :exports both
+  matrix = np.array([[-vr_to_rl_scale_sep[0], 0,                             vr_to_rl_translation[0]],
+                     [ 0,                             -vr_to_rl_scale_sep[1], vr_to_rl_translation[1]],
+                     [ 0,                              0,                                                   1]])
+
+  np.savetxt(sys.stdout, matrix, '%2.20f')
+#+end_src
+
+#+RESULTS:
+: -0.00000576813264779818 0.00000000000000000000 49.94559641164588725815
+: 0.00000000000000000000 -0.00000911974025274393 -119.39038758729782330192
+: 0.00000000000000000000 0.00000000000000000000 1.00000000000000000000
+
+** Test
+
+#+begin_src jupyter-python :exports both
+  def convert_to_rl(c, expected, _matrix=None):
+      if _matrix is None:
+          _matrix = matrix
+      out = (_matrix @ [c[0], c[1], 1])[:2]
+      print(c, out, expected, out - expected)
+      return out
+
+  convert_to_rl(vr_p1, rl_p1)
+  convert_to_rl(vr_p2, rl_p2)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: [421.1 223.1] [  49.94316745 -119.3924222 ] [  49.94316745 -119.3924222 ] [0. 0.]
+: [-398.  -121.2] [  49.94789213 -119.38928227] [  49.94789213 -119.38928227] [0. 0.]
+: array([  49.94789213, -119.38928227])
+:END:
+
+#+begin_src jupyter-python :exports both
+  def convert_to_vr(c, expected, _matrix=None):
+      if _matrix is None:
+          _matrix = matrix
+      out = (np.linalg.inv(_matrix) @ [c[0], c[1], 1])[:2]
+      print(c, out, expected, out - expected)
+      return out
+
+  convert_to_vr(rl_p1, vr_p1)
+  convert_to_vr(rl_p2, vr_p2)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: [  49.94316745 -119.3924222 ] [421.1 223.1] [421.1 223.1] [-0. -0.]
+: [  49.94789213 -119.38928227] [-398.  -121.2] [-398.  -121.2] [ 0. -0.]
+: array([-398. , -121.2])
+:END:
+
+** Testing a few more points:
+
+#+begin_src jupyter-python :exports both
+  convert_to_rl(vr_p3, rl_p3)
+  convert_to_vr(rl_p3, vr_p3)
+  convert_to_rl(vr_p4, rl_p4)
+  convert_to_vr(rl_p4, vr_p4)
+  convert_to_rl(vr_p5, rl_p5)
+  convert_to_vr(rl_p5, vr_p5)
+#+end_src
+
+#+RESULTS:
+:RESULTS:
+: [482.   63.2] [  49.94281617 -119.39096395] [  49.94280486 -119.39094403] [ 0.00001131 -0.00001992]
+: [  49.94280486 -119.39094403] [483.96077808  61.01571486] [482.   63.2] [ 1.96077808 -2.18428514]
+: [-425.3 -368.6] [  49.9480496  -119.38702605] [  49.94804809 -119.38700156] [ 0.00000151 -0.00002449]
+: [  49.94804809 -119.38700156] [-425.0386549  -371.28573895] [-425.3 -368.6] [ 0.2613451  -2.68573895]
+: [ 163.7 -436.8] [  49.94465217 -119.38640408] [  49.94464602 -119.38640773] [0.00000615 0.00000364]
+: [  49.94464602 -119.38640773] [ 164.76560874 -436.40055508] [ 163.7 -436.8] [1.06560874 0.39944492]
+: array([ 164.76560874, -436.40055508])
+:END:
+
++The errors are too big.+ Consider averaging?
+
+Actually they are not. had recalculated some of the coordinates. I stopped using the corners of building, which seems to be what was giving bad numbers. Still doing the average.
+
+
+#+begin_src jupyter-python :exports both
+  paired = [(vr_p1, rl_p1),
+            (vr_p2, rl_p2),
+            (vr_p3, rl_p3),
+            (vr_p4, rl_p4),
+            (vr_p5, rl_p5)]
+
+  avg_vr2rl_scale = np.array([0.0, 0.0])
+  i = 0
+  for (vr1, rl1), (vr2, rl2) in combinations(paired, 2):
+      avg_vr2rl_scale += np.abs(rl1 - rl2) / np.abs(vr1 - vr2)
+      i += 1
+
+  avg_vr2rl_scale /= i
+  np.savetxt(sys.stdout, avg_vr2rl_scale, '%.10f')
+  np.savetxt(sys.stdout, vr_to_rl_scale_sep, '%.10f')
+
+
+  for (vr1, rl1), (vr2, rl2) in combinations(paired, 2):
+      print("combo", vr1, vr2)
+      print(np.abs(rl1 - rl2) - avg_vr2rl_scale * np.abs(vr1 - vr2))
+
+  print(np.abs(rl_p2 - rl_p1) - avg_vr2rl_scale * np.abs(vr_p2 - vr_p1))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+  0.0000057845
+  0.0000090888
+  0.0000057681
+  0.0000091197
+  combo [421.1 223.1] [-398.  -121.2]
+  [-0.00001339  0.00001065]
+  combo [421.1 223.1] [482.   63.2]
+  [0.00001031 0.00002486]
+  combo [421.1 223.1] [-425.3 -368.6]
+  [-0.00001535  0.00004279]
+  combo [421.1 223.1] [ 163.7 -436.8]
+  [-0.00001036  0.00001676]
+  combo [-398.  -121.2] [482.   63.2]
+  [-0.00000308 -0.00001422]
+  combo [-398.  -121.2] [-425.3 -368.6]
+  [-0.00000195  0.00003214]
+  combo [-398.  -121.2] [ 163.7 -436.8]
+  [-0.00000304  0.00000612]
+  combo [482.   63.2] [-425.3 -368.6]
+  [-0.00000503  0.00001792]
+  combo [482.   63.2] [ 163.7 -436.8]
+  [-0.00000004 -0.0000081 ]
+  combo [-425.3 -368.6] [ 163.7 -436.8]
+  [-0.00000499 -0.00002603]
+  [-0.00001339  0.00001065]
+#+end_example
+
++Left out p2 as that seemed to give the best results (lowest error)+
+
+Testing if the avg scale works with the translation used before
+
+#+begin_src jupyter-python :exports both
+  matrix_v2 = np.array([[-avg_vr2rl_scale[0], 0,                  vr_to_rl_translation[0]],
+                     [ 0,                    -avg_vr2rl_scale[1], vr_to_rl_translation[1]],
+                     [ 0,                      0,                 1]])
+
+  paired = [(vr_p1, rl_p1),
+            (vr_p2, rl_p2),
+            (vr_p3, rl_p3),
+            (vr_p4, rl_p4),
+            (vr_p5, rl_p5)]
+
+  for vr, rl in paired:
+      convert_to_rl(vr, rl, matrix_v2)
+      convert_to_vr(rl, vr, matrix_v2)
+      print("--------")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+  [421.1 223.1] [  49.94316056 -119.3924153 ] [  49.94316745 -119.3924222 ] [-0.00000689  0.0000069 ]
+  [  49.94316745 -119.3924222 ] [419.9095107  223.85898484] [421.1 223.1] [-1.1904893   0.75898484]
+  --------
+  [-398.  -121.2] [  49.94789864 -119.38928602] [  49.94789213 -119.38928227] [ 0.00000651 -0.00000375]
+  [  49.94789213 -119.38928227] [-396.87481657 -121.61232166] [-398.  -121.2] [ 1.12518343 -0.41232166]
+  --------
+  [482.   63.2] [  49.94280829 -119.390962  ] [  49.94280486 -119.39094403] [ 0.00000343 -0.00001797]
+  [  49.94280486 -119.39094403] [482.59257545  61.22328995] [482.   63.2] [ 0.59257545 -1.97671005]
+  --------
+  [-425.3 -368.6] [  49.94805655 -119.38703745] [  49.94804809 -119.38700156] [ 0.00000846 -0.00003589]
+  [  49.94804809 -119.38700156] [-423.83703065 -372.54885076] [-425.3 -368.6] [ 1.46296935 -3.94885076]
+  --------
+  [ 163.7 -436.8] [  49.94464949 -119.38641759] [  49.94464602 -119.38640773] [ 0.00000347 -0.00000986]
+  [  49.94464602 -119.38640773] [ 164.29980087 -437.8851871 ] [ 163.7 -436.8] [ 0.59980087 -1.0851871 ]
+  --------
+#+end_example
+
+
+Using just the averaged scale is not enough?
+
+#+begin_src jupyter-python :exports both
+  avg_vr2rl_translation = np.array([0.0, 0.0])
+
+  paired = [(vr_p1, rl_p1),
+            (vr_p2, rl_p2),
+            (vr_p3, rl_p3),
+            (vr_p4, rl_p4),
+            (vr_p5, rl_p5)]
+
+  for (vr, rl) in paired:
+      avg_vr2rl_translation += rl - vr * avg_vr2rl_scale * [-1, -1]
+
+  avg_vr2rl_translation /= len(paired)
+  print(avg_vr2rl_translation, vr_to_rl_translation)
+
+  for (vr, rl) in paired:
+      print(rl - (vr * avg_vr2rl_scale * [-1, -1] + avg_vr2rl_translation))
+#+end_src
+
+#+RESULTS:
+: [  49.94559342 -119.39037547] [  49.94559641 -119.39038759]
+: [ 0.00000988 -0.00001901]
+: [-0.00000351 -0.00000837]
+: [-0.00000043  0.00000585]
+: [-0.00000547  0.00002378]
+: [-0.00000047 -0.00000225]
+
+Testing with average scale and translation
+
+#+begin_src jupyter-python :exports both
+  matrix_v3 = np.array([[-avg_vr2rl_scale[0], 0,                   avg_vr2rl_translation[0]],
+                        [ 0,                  -avg_vr2rl_scale[1], avg_vr2rl_translation[1]],
+                        [ 0,                  0,                   1]])
+
+  paired = [(vr_p1, rl_p1),
+            (vr_p2, rl_p2),
+            (vr_p3, rl_p3),
+            (vr_p4, rl_p4),
+            (vr_p5, rl_p5)]
+
+  for vr, rl in paired:
+      print("1")
+      convert_to_rl(vr, rl, matrix)
+      print("2")
+      convert_to_rl(vr, rl, matrix_v2)
+      print("3")
+      convert_to_rl(vr, rl, matrix_v3)
+      print("--------------")
+
+  print("+++++++++++++++++++++++++++++++++++++++++++++")
+  for vr, rl in paired:
+      print("1")
+      convert_to_vr(rl, vr, matrix)
+      print("2")
+      convert_to_vr(rl, vr, matrix_v2)
+      print("3")
+      convert_to_vr(rl, vr, matrix_v3)
+      print("--------------")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+  1
+  [421.1 223.1] [  49.94316745 -119.3924222 ] [  49.94316745 -119.3924222 ] [0. 0.]
+  2
+  [421.1 223.1] [  49.94316056 -119.3924153 ] [  49.94316745 -119.3924222 ] [-0.00000689  0.0000069 ]
+  3
+  [421.1 223.1] [  49.94315757 -119.39240319] [  49.94316745 -119.3924222 ] [-0.00000988  0.00001901]
+  --------------
+  1
+  [-398.  -121.2] [  49.94789213 -119.38928227] [  49.94789213 -119.38928227] [0. 0.]
+  2
+  [-398.  -121.2] [  49.94789864 -119.38928602] [  49.94789213 -119.38928227] [ 0.00000651 -0.00000375]
+  3
+  [-398.  -121.2] [  49.94789564 -119.38927391] [  49.94789213 -119.38928227] [0.00000351 0.00000837]
+  --------------
+  1
+  [482.   63.2] [  49.94281617 -119.39096395] [  49.94280486 -119.39094403] [ 0.00001131 -0.00001992]
+  2
+  [482.   63.2] [  49.94280829 -119.390962  ] [  49.94280486 -119.39094403] [ 0.00000343 -0.00001797]
+  3
+  [482.   63.2] [  49.94280529 -119.39094989] [  49.94280486 -119.39094403] [ 0.00000043 -0.00000585]
+  --------------
+  1
+  [-425.3 -368.6] [  49.9480496  -119.38702605] [  49.94804809 -119.38700156] [ 0.00000151 -0.00002449]
+  2
+  [-425.3 -368.6] [  49.94805655 -119.38703745] [  49.94804809 -119.38700156] [ 0.00000846 -0.00003589]
+  3
+  [-425.3 -368.6] [  49.94805356 -119.38702533] [  49.94804809 -119.38700156] [ 0.00000547 -0.00002378]
+  --------------
+  1
+  [ 163.7 -436.8] [  49.94465217 -119.38640408] [  49.94464602 -119.38640773] [0.00000615 0.00000364]
+  2
+  [ 163.7 -436.8] [  49.94464949 -119.38641759] [  49.94464602 -119.38640773] [ 0.00000347 -0.00000986]
+  3
+  [ 163.7 -436.8] [  49.94464649 -119.38640548] [  49.94464602 -119.38640773] [0.00000047 0.00000225]
+  --------------
+  +++++++++++++++++++++++++++++++++++++++++++++
+  1
+  [  49.94316745 -119.3924222 ] [421.1 223.1] [421.1 223.1] [-0. -0.]
+  2
+  [  49.94316745 -119.3924222 ] [419.9095107  223.85898484] [421.1 223.1] [-1.1904893   0.75898484]
+  3
+  [  49.94316745 -119.3924222 ] [419.39150274 225.19180178] [421.1 223.1] [-1.70849726  2.09180178]
+  --------------
+  1
+  [  49.94789213 -119.38928227] [-398.  -121.2] [-398.  -121.2] [ 0. -0.]
+  2
+  [  49.94789213 -119.38928227] [-396.87481657 -121.61232166] [-398.  -121.2] [ 1.12518343 -0.41232166]
+  3
+  [  49.94789213 -119.38928227] [-397.39282453 -120.27950472] [-398.  -121.2] [0.60717547 0.92049528]
+  --------------
+  1
+  [  49.94280486 -119.39094403] [483.96077808  61.01571486] [482.   63.2] [ 1.96077808 -2.18428514]
+  2
+  [  49.94280486 -119.39094403] [482.59257545  61.22328995] [482.   63.2] [ 0.59257545 -1.97671005]
+  3
+  [  49.94280486 -119.39094403] [482.07456749  62.5561069 ] [482.   63.2] [ 0.07456749 -0.6438931 ]
+  --------------
+  1
+  [  49.94804809 -119.38700156] [-425.0386549  -371.28573895] [-425.3 -368.6] [ 0.2613451  -2.68573895]
+  2
+  [  49.94804809 -119.38700156] [-423.83703065 -372.54885076] [-425.3 -368.6] [ 1.46296935 -3.94885076]
+  3
+  [  49.94804809 -119.38700156] [-424.35503861 -371.21603382] [-425.3 -368.6] [ 0.94496139 -2.61603382]
+  --------------
+  1
+  [  49.94464602 -119.38640773] [ 164.76560874 -436.40055508] [ 163.7 -436.8] [1.06560874 0.39944492]
+  2
+  [  49.94464602 -119.38640773] [ 164.29980087 -437.8851871 ] [ 163.7 -436.8] [ 0.59980087 -1.0851871 ]
+  3
+  [  49.94464602 -119.38640773] [ 163.78179292 -436.55237016] [ 163.7 -436.8] [0.08179292 0.24762984]
+  --------------
+#+end_example
+
+Seems to be good enough. The last pair is the error.
+Working matrix:
+
+#+begin_src jupyter-python :exports both
+  np.savetxt(sys.stdout, matrix_v3, '%.20f')
+#+end_src
+
+#+RESULTS:
+: -0.00000578448593347400 0.00000000000000000000 49.94559341523613227309
+: 0.00000000000000000000 -0.00000908882014213997 -119.39037547356433321966
+: 0.00000000000000000000 0.00000000000000000000 1.00000000000000000000
