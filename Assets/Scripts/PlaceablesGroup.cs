@@ -103,7 +103,8 @@ namespace ubco.hcilab.roadmap
                         GeospatialManager.Instance.TargetAccuracyReached.AddListener(DetachFromGeoAnchor);
                     break;
                 case Platform.Oculus:
-                    // TODO: add the resotre values?
+                    transform.position = new Vector3((float)data.Longitude, (float)data.Altitude, (float)data.Latitude);
+                    transform.rotation = Quaternion.AngleAxis((float)data.Heading, Vector3.up);
                     break;
                 default:
                     throw new NotImplementedException();
@@ -188,12 +189,13 @@ namespace ubco.hcilab.roadmap
                     case Platform.Oculus:
                         /// -z is north, x is west
                         /// heading is the camera's forward vector projected on the xz plane (y is the plane normal vector)
-                        float heading = Vector3.Angle(-Vector3.forward,
-                                                      Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up));
+                        // Heading not needed in the VR scene
+                        // float heading = Vector3.Angle(-Vector3.forward,
+                        //                               Vector3.ProjectOnPlane(Camera.main.transform.forward, Vector3.up));
                         _groupData = new GroupData(Camera.main.transform.position.z,
                                                    Camera.main.transform.position.x,
                                                    Camera.main.transform.position.y,
-                                                   heading,
+                                                   0,
                                                    new List<PlaceableObjectData>());
                         break;
                     default:

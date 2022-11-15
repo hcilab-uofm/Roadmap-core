@@ -12,6 +12,18 @@ namespace ubco.hcilab.roadmap
         private const string DB_SCENES = "scenes";
         private const string DB_GROUPS = "groups";
 
+        // See `docs/_calculating_translation.org` for how this is calculated
+        private float vrToArLatitude_coeff = -0.00000578448593347400f;
+        private float vrToArLatitude_bias = 49.94559341523613227309f;
+        private float vrToArLongitude_coeff = -0.00000908882014213997f;
+        private float vrToArLongitude_bias = -119.39037547356433321966f;
+        private float vrToArAltitude = 440;
+        private float arToVrLatitude_coeff = -172876.20913954381830990314f;
+        private float arToVrLatitude_bias = 8634404.85285098478198051453f;
+        private float arToVrLongitude_coeff = -110025.28208953527791891247f;
+        private float arToVrLongitude_bias = -13135959.74025445058941841125f;
+        private float arToVrAltitude = -440;
+
         private DatabaseReference dbReference;
         // Start is called before the first frame update
         void Start()
@@ -185,7 +197,29 @@ namespace ubco.hcilab.roadmap
                 /// if the platforms are different transfrom data
                 if (remoteData.LastWrittenPlatform != localData.LastWrittenPlatform)
                 {
-                    // TODO: Figure out how to use groupStats to convert between coord systems
+                    switch (System.Enum.Parse<Platform>(localData.LastWrittenPlatform))
+                    {
+                        case Platform.Oculus:
+                            foreach (var _group in groupData)
+                            {
+                                if (groupStates[_group.Key] == 1)
+                                {
+                                    ArToVr(_group.Value);
+                                }
+                            }
+                            break;
+                        case Platform.ARCore:
+                            foreach (var _group in groupData)
+                            {
+                                if (groupStates[_group.Key] == 1)
+                                {
+                                    VrtoAr(_group.Value);
+                                }
+                            }
+                            break;
+                        default:
+                            throw new System.NotImplementedException();
+                    }
                 }
 
                 /// localData has the current platform set as LastWrittenPlatform
@@ -207,7 +241,27 @@ namespace ubco.hcilab.roadmap
         {
             ProcessRemoteStorageData((remoteData) =>
             {
-                PlaceablesManager.Instance.LoadFromLocalStorageData(remoteData.GetData());
+                LocalStorageData data = remoteData.GetData();
+                Platform lastWrittenPlatform = System.Enum.Parse<Platform>(data.LastWrittenPlatform);
+                if (lastWrittenPlatform != PlatformManager.Instance.CurrentPlatform)
+                {
+                    foreach (var _group in data.Groups)
+                    {
+                        switch (lastWrittenPlatform)
+                        {
+                            case Platform.Oculus:
+                                VrtoAr(_group);
+                                break;
+                            case Platform.ARCore:
+                                ArToVr(_group);
+                                break;
+                            default:
+                                throw new System.NotImplementedException();
+                        }
+                    }
+                }
+
+                PlaceablesManager.Instance.LoadFromLocalStorageData(data);
             });
         }
 
@@ -230,6 +284,22 @@ namespace ubco.hcilab.roadmap
                     });
                 }
             });
+        }
+
+        protected GroupData VrtoAr(GroupData data)
+        {
+            data.Latitude = vrToArLatitude_coeff * data.Latitude + vrToArLatitude_bias;
+            data.Longitude = vrToArLongitude_coeff * data.Latitude + vrToArLongitude_bias;
+            data.Altitude = data.Altitude + vrToArAltitude;
+            return data;
+        }
+
+        protected GroupData ArToVr(GroupData data)
+        {
+            data.Latitude = arToVrLatitude_coeff * data.Latitude + arToVrLatitude_bias;
+            data.Longitude = arToVrLongitude_coeff * data.Longitude + arToVrLongitude_bias;
+            data.Altitude = data.Altitude + arToVrAltitude;
+            return data;
         }
     }
 
