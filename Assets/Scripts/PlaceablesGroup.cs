@@ -104,7 +104,8 @@ namespace ubco.hcilab.roadmap
                     break;
                 case Platform.Oculus:
                     transform.position = new Vector3((float)data.Longitude, (float)data.Altitude, (float)data.Latitude);
-                    transform.rotation = Quaternion.AngleAxis((float)data.Heading, Vector3.up);
+                    transform.rotation = Quaternion.LookRotation(Vector3.back, Vector3.up);
+                    transform.Rotate(Vector3.up, (float)data.Heading);
                     break;
                 default:
                     throw new NotImplementedException();
