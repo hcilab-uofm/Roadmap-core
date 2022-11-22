@@ -23,7 +23,6 @@ namespace ubco.hcilab.roadmap
             GridObjectCollection gridObjectCollection = scrollMenu.GetComponentInChildren<GridObjectCollection>();
             foreach (PlaceableContainer item in PlaceablesManager.Instance.applicationConfig.PlacableIdentifierList())
             {
-                Debug.Log($"{item}");
                 GameObject menuItem = GameObject.Instantiate(menuItemPrefab, gridObjectCollection.transform);
                 ButtonConfigHelper buttonConfigHelper = menuItem.GetComponent<ButtonConfigHelper>();
                 buttonConfigHelper.SeeItSayItLabelEnabled = false;

@@ -1,13 +1,15 @@
 using System.Linq;
-using Firebase.Database;
 using System.Collections.Generic;
 using UnityEngine;
 using Newtonsoft.Json;
+using UnityEngine.Networking;
+using System.Collections;
 
 namespace ubco.hcilab.roadmap
 {
     public class RemoteDataSynchronization : MonoBehaviour
     {
+        private const string SERVER_URL = "https://roadmap-ubco-default-rtdb.firebaseio.com/";
         private const string DB_SCENE_DATA = "scene_data";
         private const string DB_SCENES = "scenes";
         private const string DB_GROUPS = "groups";
@@ -23,31 +25,6 @@ namespace ubco.hcilab.roadmap
         private float arToVrLongitude_coeff = -110025.28208953527791891247f;
         private float arToVrLongitude_bias = -13135959.74025445058941841125f;
         private float arToVrAltitude = -440;
-
-        private DatabaseReference dbReference;
-        // Start is called before the first frame update
-        void Start()
-        {
-            // Get the root reference location of the database.
-            dbReference = FirebaseDatabase.DefaultInstance.RootReference;
-        }
-
-        public void RunWithReference(string reference, System.Action<DataSnapshot> withSnapshot)
-        {
-            FirebaseDatabase.DefaultInstance.GetReference(reference)
-                .GetValueAsync().ContinueWith(task =>
-                {
-                    if (task.IsFaulted)
-                    {
-                        Debug.LogError($"Error in db reading");
-                    }
-                    else if (task.IsCompleted)
-                    {
-                        DataSnapshot snapshot = task.Result;
-                        withSnapshot(snapshot);
-                    }
-                });
-        }
 
         private string SceneID()
         {
@@ -66,25 +43,16 @@ namespace ubco.hcilab.roadmap
         /// Run callable after verifying the scene exists in "scenes"
         private void CheckSceneInScenes(System.Action callable)
         {
-            RunWithReference($"/{DB_SCENES}/{SceneID()}", (snapshot) =>
+            ProcessRequest($"/{DB_SCENES}/{SceneID()}", HTTPMethod.GET, (dataString) =>
             {
-                if (snapshot == null || snapshot.Value == null)
+                if (string.IsNullOrEmpty(dataString) || dataString == "null")
                 {
-                    Dictionary<string, object> childUpdates = new Dictionary<string, object>();
-                    childUpdates[$"/{DB_SCENES}/{SceneID()}/{DB_GROUPS}/{GroupID()}"] = true;
-                    childUpdates[$"/{DB_GROUPS}/{GroupID()}/{DB_SCENES}/{SceneID()}"] = true;
-
-                    dbReference.UpdateChildrenAsync(childUpdates).ContinueWith(task =>
+                    ProcessRequest($"/{DB_SCENES}/{SceneID()}/{DB_GROUPS}/{GroupID()}", HTTPMethod.PUT, data: JsonConvert.SerializeObject(true), action: (_) =>
                     {
-                        if (task.IsFaulted)
+                        ProcessRequest($"/{DB_GROUPS}/{GroupID()}/{DB_SCENES}/{SceneID()}", HTTPMethod.PUT, data:  JsonConvert.SerializeObject(true), action: (_) =>
                         {
-                            Debug.LogError($"Error in db reading");
-                        }
-                        else if (task.IsCompleted)
-                        {
-                            /// If the scene was successfully updated, run callable
                             callable();
-                        }
+                        });
                     });
                 }
                 else
@@ -98,14 +66,17 @@ namespace ubco.hcilab.roadmap
         {
             CheckSceneInScenes(() =>
             {
-                string key = dbReference.Child(DB_SCENE_DATA).Push().Key;
                 RemoteStorageData sceneData = new RemoteStorageData(System.DateTime.Now.Ticks, data);
 
-                Dictionary<string, object> childUpdates = new Dictionary<string, object>();
-                childUpdates[$"/{DB_SCENE_DATA}/{key}"] = sceneData.ToDictionary();
-                childUpdates[$"/{DB_SCENES}/{SceneID()}/{DB_SCENE_DATA}/{key}"] = sceneData.commit_time;
+                ProcessRequest($"/{DB_SCENE_DATA}", HTTPMethod.POST, (nameString) =>
+                {
+                    string name = JsonConvert.DeserializeAnonymousType(nameString, new { name = "" }).name;
+                    ProcessRequest($"/{DB_SCENE_DATA}/{name}", HTTPMethod.PUT, (dataString) =>
+                    {
+                        ProcessRequest($"/{DB_SCENES}/{SceneID()}/{DB_SCENE_DATA}/{name}", HTTPMethod.PUT, null, JsonConvert.SerializeObject(sceneData.commit_time));
+                    }, JsonConvert.SerializeObject(sceneData, new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+                }, JsonConvert.SerializeObject(true));
 
-                dbReference.UpdateChildrenAsync(childUpdates);
             });
         }
 
@@ -267,22 +238,15 @@ namespace ubco.hcilab.roadmap
 
         public void ProcessRemoteStorageData(System.Action<RemoteStorageData> callback)
         {
-            RunWithReference($"/{DB_SCENES}/{SceneID()}/{DB_SCENE_DATA}", (snapshot) =>
+            ProcessRequest($"/{DB_SCENES}/{SceneID()}/{DB_SCENE_DATA}", HTTPMethod.GET, (idStrings) =>
             {
-                if (snapshot == null)
+                Dictionary<string, long> sceneData = JsonConvert.DeserializeObject<Dictionary<string, long>>(idStrings);
+                string sceneDataId = sceneData.OrderByDescending(kvp => kvp.Key).First().Key;
+                ProcessRequest($"/{DB_SCENE_DATA}/{sceneDataId}", HTTPMethod.GET, (dataString) =>
                 {
-                    Debug.LogError($"No scene to sync");
-                }
-                else
-                {
-                    Dictionary<string, long> sceneData = JsonConvert.DeserializeObject<Dictionary<string, long>>(snapshot.GetRawJsonValue());
-                    string sceneDataId = sceneData.OrderByDescending(kvp => kvp.Key).First().Key;
-                    RunWithReference($"/{DB_SCENE_DATA}/{sceneDataId}", (snapshot) =>
-                    {
-                        RemoteStorageData remoteData = JsonUtility.FromJson<RemoteStorageData>(snapshot.GetRawJsonValue());
-                        callback(remoteData);
-                    });
-                }
+                    RemoteStorageData remoteData = JsonUtility.FromJson<RemoteStorageData>(dataString);
+                    callback(remoteData);
+                });
             });
         }
 
@@ -301,6 +265,56 @@ namespace ubco.hcilab.roadmap
             data.Altitude = data.Altitude + arToVrAltitude;
             return data;
         }
+
+        protected void ProcessRequest(string endpoint, HTTPMethod method, System.Action<string> action=null, string data="")
+        {
+            StartCoroutine(GetJsonUrl(endpoint, method, action, data));
+        }
+
+        protected UnityWebRequest GetMethod(HTTPMethod method, string url, string data)
+        {
+            switch (method)
+            {
+                case HTTPMethod.GET:
+                    return UnityWebRequest.Get(url);
+                case HTTPMethod.POST:
+                    return UnityWebRequest.Post(url, data);
+                case HTTPMethod.PUT:
+                    return UnityWebRequest.Put(url, data);
+                default:
+                    throw new System.NotImplementedException();
+            }
+        }
+
+        protected IEnumerator GetJsonUrl(string endpoint, HTTPMethod method, System.Action<string> action=null, string data="")
+        {
+            string url = $"{SERVER_URL}{endpoint}.json";
+            using (UnityWebRequest webRequest = GetMethod(method, url, data))
+            {
+                webRequest.timeout = 5;
+                yield return webRequest.SendWebRequest();
+
+                bool error;
+#if UNITY_2020_OR_NEWER
+                error = webRequest.result != UnityWebRequest.Result.Success;
+#else
+#pragma warning disable
+                error = webRequest.isHttpError || webRequest.isNetworkError;
+#pragma warning restore
+#endif
+
+                if (error)
+                {
+                    Debug.LogError($"Request for {url} failed with: {webRequest.error}");
+                    yield break;
+                }
+
+                if (action != null)
+                {
+                    action(System.Text.Encoding.UTF8.GetString(webRequest.downloadHandler.data));
+                }
+            }
+        }
     }
 
     [System.Serializable]
@@ -308,40 +322,29 @@ namespace ubco.hcilab.roadmap
     {
         public long commit_time;
         public string platform;
-        public string data;// LocalStorageData
+        public LocalStorageData data;// LocalStorageData
 
         public RemoteStorageData(long commit_time, string platform, LocalStorageData data)
         {
             this.commit_time = commit_time;
-            this.data = JsonUtility.ToJson(data);
+            this.data = data;
             this.platform = platform;
         }
 
         public RemoteStorageData(long commit_time, LocalStorageData data)
         {
             this.commit_time = commit_time;
-            this.data = JsonUtility.ToJson(data);
+            this.data = data;
             this.platform = data.LastWrittenPlatform;
-        }
-
-        public Dictionary<string, object> ToDictionary()
-        {
-            Dictionary<string, object> result = new Dictionary<string, object>();
-            result["commit_time"] = commit_time;
-            result["data"] = data;
-            result["platform"] = platform;
-            return result;
         }
 
         public LocalStorageData GetData()
         {
-            return JsonUtility.FromJson<LocalStorageData>(data);
+            return data;
         }
     }
 
-    public class SceneData
-    {
-        public string sceneId;
-        public long commit_time;
+    public enum HTTPMethod {
+        GET, POST, PUT
     }
 }
