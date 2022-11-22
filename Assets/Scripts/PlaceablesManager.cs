@@ -474,6 +474,7 @@ namespace ubco.hcilab.roadmap
 
             System.IO.File.WriteAllText(GetSaveFileLocation(), jsonString);
             PlayerPrefs.Save();
+            Debug.Log($"Saving data");
             _saveQueued = false;
         }
 

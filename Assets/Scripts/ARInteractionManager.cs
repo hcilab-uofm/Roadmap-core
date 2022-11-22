@@ -3,6 +3,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
 using UnityEngine.XR.ARSubsystems;
 
@@ -54,6 +55,24 @@ namespace ubco.hcilab.roadmap
         /// </summary>
         [HideInInspector] public UnityEvent<Vector2> TouchPositionChanged;
 
+        [SerializeField] private Button StartButton;
+        [SerializeField] private GameObject StartButtonLabel;
+
+        [SerializeField] private Button RemoveButton;
+        [SerializeField] private GameObject RemoveButtonLabel;
+
+        [SerializeField] private Button ModifyButton;
+        [SerializeField] private GameObject ModifyButtonLabel;
+
+        [SerializeField] private Button confirmation_yesButton;
+        [SerializeField] private Button confirmation_noButton;
+        [SerializeField] private GameObject confirmationLabel;
+        [SerializeField] private GameObject confirmationDialog;
+
+        [SerializeField] private Button sync_overwriteLocal;
+        [SerializeField] private Button sync_overwriteRemote;
+        [SerializeField] private Button sync_sync;
+
         private List<ARRaycastHit> _hits = new List<ARRaycastHit>();
         private List<ARPlane> _allPlanes = new List<ARPlane>();
         private ARPlane _currentARPlane;
@@ -88,6 +107,8 @@ namespace ubco.hcilab.roadmap
         [Tooltip("Screen taps below this normalized height will be ignored")]
         [SerializeField] private float _screenTapLowerCutoff = 0.15f;
 
+        private bool removing = false;
+
         private void Start()
         {
             _interactionManager = InteractionManager.Instance;
@@ -107,6 +128,80 @@ namespace ubco.hcilab.roadmap
             typeOptions.AddOptions(PlaceablesManager.Instance.applicationConfig.PlacableIdentifierList().Select(x => x.identifier).ToList());
             /// Settting initial value of the typeoptions
             PlaceablesManager.Instance.UpdatePrefabIdentifier(typeOptions.options[typeOptions.value].text);
+
+            StartButton.onClick.AddListener(InteractionManager.Instance.ChangeMode);
+            InteractionManager.Instance.OnChangeMode += OnChangeMode;
+
+            ModifyButton.onClick.AddListener(InteractionManager.Instance.ModifyModeToggle);
+            InteractionManager.Instance.OnModificationChanged += (modifying) =>
+            {
+                if (modifying)
+                {
+                    ModifyButtonLabel.GetComponent<TextMeshProUGUI>().text = "Modify\n(turn off)";
+                }
+                else
+                {
+                    ModifyButtonLabel.GetComponent<TextMeshProUGUI>().text = "Modify\n(turn on)";
+                }
+            };
+
+            RemoveButton.onClick.AddListener(() =>
+            {
+                InteractionManager.Instance.ToggleRemove();
+                removing = !removing;
+
+                if (removing)
+                {
+                    RemoveButtonLabel.GetComponent<TextMeshProUGUI>().text = "Stop removing";
+                }
+                else
+                {
+                    RemoveButtonLabel.GetComponent<TextMeshProUGUI>().text = "Remove";
+                }
+            });
+            InteractionManager.Instance.OnRemoveRequested += (obj) =>
+            {
+                Confirmation("Remove Selected Object?", () => Destroy(obj), null);
+            };
+
+            RemoteDataSynchronization remoteSynchronization = GetComponent<RemoteDataSynchronization>();
+            sync_overwriteLocal.onClick.AddListener(
+                () => Confirmation("Overwrite local data with remote data? Local data will be ignored.",
+                                   () => remoteSynchronization.OverwriteLocal()));
+            sync_overwriteRemote.onClick.AddListener(
+                () => Confirmation("Overwrite remote data with local data? Data on remote will be ignored.",
+                                   () => remoteSynchronization.OverwriteRemote()));
+            sync_sync.onClick.AddListener(
+                () => Confirmation("Sync remote and local? Will combine what's in the remote and local",
+                                   () => remoteSynchronization.SyncWithRemote()));
+        }
+
+        private void OnChangeMode(bool run)
+        {
+            if(run)
+            {
+                StartButtonLabel.GetComponent<TextMeshProUGUI>().text = "Stop";
+            }
+            else
+            {
+                StartButtonLabel.GetComponent<TextMeshProUGUI>().text = "Add Model";
+            }
+        }
+
+        private void Confirmation(string label, System.Action yesCallback, System.Action noCallback = null)
+        {
+            confirmationDialog.SetActive(true);
+            confirmation_yesButton.onClick.AddListener(() =>
+            {
+                yesCallback?.Invoke();
+                confirmationDialog.SetActive(false);
+            });
+
+            confirmation_noButton.onClick.AddListener(() =>
+            {
+                noCallback?.Invoke();
+                confirmationDialog.SetActive(false);
+            });
         }
 
         private void OnGeoInitCompleted()

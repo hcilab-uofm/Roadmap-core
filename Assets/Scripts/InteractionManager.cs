@@ -64,8 +64,6 @@ namespace ubco.hcilab.roadmap
         [HideInInspector] public bool run;
         private RaycastHit _raycastHit;
         private Ray _ray;
-        [SerializeField] private Button StartButton;
-        [SerializeField] private GameObject StartButtonLabel;
 
         [Tooltip("Filter raycasts for ARPlanes")]
         public LayerMask PlanesLayerMask; /// using: 1
@@ -80,30 +78,29 @@ namespace ubco.hcilab.roadmap
         private bool removing = false;
         private GameObject touchedObject;
 
+        public System.Action<bool> OnChangeMode;
         public System.Action<bool> OnModificationChanged;
         public System.Action<GameObject> OnTouchObjectChanged;
         public System.Action<GameObject> OnRemoveRequested;
 
         private void Start()
         {
-            if (StartButton != null)
-                StartButton.onClick.AddListener(ChangeMode);
+
         }
 
-        private void ChangeMode()
+        public void ChangeMode()
         {
-            if(StartButtonLabel.GetComponent<TextMeshProUGUI>().text == "Add Model")
+            if(!run)
             {
-                StartButtonLabel.GetComponent<TextMeshProUGUI>().text = "Stop";
                 SetInteractionState(InteractionState.Placing);
                 run = true;
             }
             else
             {
-                StartButtonLabel.GetComponent<TextMeshProUGUI>().text = "Add Model";
                 SetInteractionState(InteractionState.None);
                 run = false;
             }
+            OnChangeMode?.Invoke(run);
         }
 
         private void Update()
