@@ -27,10 +27,10 @@ namespace ubco.hcilab.roadmap
         [SerializeField] private List<PlaceableContainer> placables = new List<PlaceableContainer>();
 
         public System.Action onChanged;
-        private BoxDisplayConfiguration boxDisplayConfiguration;
-        private ScaleHandlesConfiguration scaleHandlesConfiguration;
-        private RotationHandlesConfiguration rotationHandlesConfiguration;
-        private TranslationHandlesConfiguration translationHandlesConfig;
+        [SerializeField][HideInInspector] private BoxDisplayConfiguration boxDisplayConfiguration;
+        [SerializeField][HideInInspector] private ScaleHandlesConfiguration scaleHandlesConfiguration;
+        [SerializeField][HideInInspector] private RotationHandlesConfiguration rotationHandlesConfiguration;
+        [SerializeField][HideInInspector] private TranslationHandlesConfiguration translationHandlesConfig;
 
         public string BuildKey { get => identifier + _buildKey + groupID; private set => _buildKey = value; }
 

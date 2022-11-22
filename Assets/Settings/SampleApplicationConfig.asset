@@ -75,3 +75,11 @@ MonoBehaviour:
   - identifier: water
     prefab: {fileID: 7976716205616327022, guid: 06175a8a1179646089a59b91a0096945,
       type: 3}
+  boxDisplayConfiguration: {fileID: 11400000, guid: d35d83b00d0d3ed45ae40f0d4f92cba7,
+    type: 2}
+  scaleHandlesConfiguration: {fileID: 11400000, guid: f8661cd96f8601e45b68a8cecd9c3940,
+    type: 2}
+  rotationHandlesConfiguration: {fileID: 11400000, guid: 17b8359ee54c7ec4e806f32d46e66e55,
+    type: 2}
+  translationHandlesConfig: {fileID: 11400000, guid: 0a89d45f428a82c4d9553ffed2a50688,
+    type: 2}

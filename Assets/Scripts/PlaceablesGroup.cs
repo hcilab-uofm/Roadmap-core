@@ -196,7 +196,7 @@ namespace ubco.hcilab.roadmap
                         _groupData = new GroupData(Camera.main.transform.position.z,
                                                    Camera.main.transform.position.x,
                                                    Camera.main.transform.position.y,
-                                                   0,
+                                                   180,
                                                    new List<PlaceableObjectData>());
                         break;
                     default:
